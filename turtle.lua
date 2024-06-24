@@ -379,39 +379,41 @@ function library:Window(name)
 		local Max = instanceNew("TextLabel")
 
 		function SliderMovement(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				isdragging = true;
-				minitial = input.Position.X;
-				initial = SliderButton.Position.X.Offset;
-				local delta1 = SliderButton.AbsolutePosition.X - initial
-				local con;
-				con = connect(stepped, function()
-					if isdragging then
-						local xOffset = mouse.X - delta1 - 3
-						if xOffset > 175 then
-							xOffset = 175
-						elseif xOffset< 0 then
-							xOffset = 0
-						end
-						SliderButton.Position = udim2New(0, xOffset , -1.33333337, 0);
-						SilderFiller.Size = udim2New(0, xOffset, 0, 6)
-						local value = Lerp(min, max, SliderButton.Position.X.Offset/(Slider.Size.X.Offset-5))
-						Current.Text = tostring(math.round(value))
-					else
-						disconnect(con);
-					end;
-				end);
-				connect(input.Changed, function()
-					if input.UserInputState == Enum.UserInputState.End then
-						isdragging = false;
-					end;
-				end);
-			end;
+			spawn(function()
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+					isdragging = true;
+					minitial = input.Position.X;
+					initial = SliderButton.Position.X.Offset;
+					local delta1 = SliderButton.AbsolutePosition.X - initial
+					local con;
+					con = connect(stepped, function()
+						if isdragging then
+							local xOffset = mouse.X - delta1 - 3
+							if xOffset > 175 then
+								xOffset = 175
+							elseif xOffset< 0 then
+								xOffset = 0
+							end
+							SliderButton.Position = udim2New(0, xOffset , -1.33333337, 0);
+							SilderFiller.Size = udim2New(0, xOffset, 0, 6)
+							local value = Lerp(min, max, SliderButton.Position.X.Offset/(Slider.Size.X.Offset-5))
+							Current.Text = tostring(math.round(value))
+						else
+							disconnect(con);
+						end;
+					end);
+					connect(input.Changed, function()
+						if input.UserInputState == Enum.UserInputState.End then
+							isdragging = false;
+						end;
+					end);
+				end;
+			end)
 		end
 		function SliderEnd(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			local value = Lerp(min, max, SliderButton.Position.X.Offset/(Slider.Size.X.Offset-5))
-			callback(math.round(value))
+				local value = Lerp(min, max, SliderButton.Position.X.Offset/(Slider.Size.X.Offset-5))
+				callback(math.round(value))
 			end
 		end
 
