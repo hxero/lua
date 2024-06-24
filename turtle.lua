@@ -130,7 +130,7 @@ function library:Window(name)
 	UiWindow.BackgroundColor3 = fromRGB(0, 151, 230)
 	UiWindow.BorderColor3 = fromRGB(0, 151, 230)
 	UiWindow.Position = UDim2.new(0, xOffset, 0, 20)
-	UiWindow.Size = UDim2.new(0, 207, 0, 50)
+	UiWindow.Size = UDim2.new(0, 207, 0, 100)
 	UiWindow.ZIndex = 4 + zindex
 	UiWindow.Active = true
 	Dragify(UiWindow)
