@@ -337,7 +337,7 @@ function library:Window(name)
 		BoxDescription.Parent = TextBox
 		BoxDescription.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		BoxDescription.BackgroundTransparency = 1.000
-		BoxDescription.Position = UDim2.new(0, 200-99-10, 0, 0)
+		BoxDescription.Position = UDim2.new(0, 200+99+10, 0, 0)
 		BoxDescription.Size = UDim2.new(0, 200, 0, 26)
 		BoxDescription.Font = Enum.Font.SourceSans
 		BoxDescription.Text = text or "Box"
