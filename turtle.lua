@@ -129,7 +129,7 @@ function library:Window(name)
 	UiWindow.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
 	UiWindow.BorderSizePixel = 0
 	UiWindow.Position = UDim2.new(0, xOffset, 0, 20)
-	UiWindow.Size = UDim2.new(0, 207, 0, 25)
+	UiWindow.Size = UDim2.new(0, 207, 0, 26)
 	UiWindow.ZIndex = 4 + zindex
 	UiWindow.Active = true
 	Dragify(UiWindow)
@@ -139,10 +139,10 @@ function library:Window(name)
 	local Header = instanceNew("Frame")
 	Header.Name = "Header"
 	Header.Parent = UiWindow
-	Header.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	Header.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 	Header.BorderSizePixel = 0
 	Header.Position = UDim2.new(0, 0, -0.0202544238, 0)
-	Header.Size = UDim2.new(0, 207, 0, 20)
+	Header.Size = UDim2.new(0, 207, 0, 25)
 	Header.ZIndex = 5 + zindex
 
 	local HeaderText = instanceNew("TextLabel")
@@ -155,7 +155,7 @@ function library:Window(name)
 	HeaderText.ZIndex = 6 + zindex
 	HeaderText.Font = Enum.Font.SourceSans
 	HeaderText.Text = name or "Window"
-	HeaderText.TextColor3 = Color3.fromRGB(47, 54, 64)
+	HeaderText.TextColor3 = Color3.fromRGB(255, 255, 255)
 	HeaderText.TextSize = 17.000
 
 	local Minimise = instanceNew("TextButton")
@@ -169,7 +169,7 @@ function library:Window(name)
 	Minimise.ZIndex = 7 + zindex
 	Minimise.Font = Enum.Font.SourceSansLight
 	Minimise.Text = "—"
-	Minimise.TextColor3 = Color3.fromRGB(0, 0, 0)
+	Minimise.TextColor3 = Color3.fromRGB(255, 255, 255)
 	Minimise.TextSize = 20.000
 	connect(Minimise.MouseButton1Up, function()
 		Window.Visible = not Window.Visible
@@ -182,7 +182,7 @@ function library:Window(name)
 
 	Window.Name = "Window"
 	Window.Parent = Header
-	Window.BackgroundColor3 = Color3.fromRGB(47, 54, 64)
+	Window.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 	Window.BorderSizePixel = 0
 	Window.Position = UDim2.new(0, 0, 0, 0)
 	Window.Size = UDim2.new(0, 207, 0, 33)
