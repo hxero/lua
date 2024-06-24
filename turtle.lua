@@ -13,7 +13,6 @@ local findFirstChild = game.FindFirstChild;
 local destroy, clone = game.Destroy, game.Clone;
 
 local instanceNew = Instance.new
-local vector3New = Vector3.new
 local udimNew, udim2New = UDim.new, UDim2.new
 local fromRGB, fromHSV = Color3.fromRGB, Color3.fromHSV
 
@@ -63,7 +62,7 @@ function Dragify(obj)
 				local con;
 				con = connect(stepped, function()
 					if isdragging then
-						local delta = vector3New(mouse.X, mouse.Y, 0) - minitial;
+						local delta = Vector3.new(mouse.X, mouse.Y, 0) - minitial;
 						obj.Position = udim2New(initial.X.Scale, initial.X.Offset + delta.X, initial.Y.Scale, initial.Y.Offset + delta.Y);
 					else
 						disconnect(con);
