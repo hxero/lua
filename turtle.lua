@@ -311,9 +311,13 @@ function library:Window(name)
 		Window.Size = UDim2.new(0, 200, 0, sizes[winCount] + 10)
 
 		listOffset[winCount] = listOffset[winCount] + 32
+		local Folder = instanceNew("Folder")
 		local TextBox = instanceNew("TextBox")
 		local BoxDescription = instanceNew("TextLabel")
-		TextBox.Parent = Window
+		Folder.Name = "TextBox"
+		Folder.Parent = Window
+		
+		TextBox.Parent = Folder
 		TextBox.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
 		TextBox.BorderSizePixel = 0
 		TextBox.Position = UDim2.new(0, 99, 0, listOffset[winCount])
@@ -334,10 +338,10 @@ function library:Window(name)
 		end)
 
 		BoxDescription.Name = "BoxDescription"
-		BoxDescription.Parent = TextBox
+		BoxDescription.Parent = Folder
 		BoxDescription.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		BoxDescription.BackgroundTransparency = 1.000
-		BoxDescription.Position = UDim2.new(0, 200+99+10, 0, 0)
+		BoxDescription.Position = UDim2.new(0, 0, 0, 0)
 		BoxDescription.Size = UDim2.new(0, 200, 0, 26)
 		BoxDescription.Font = Enum.Font.SourceSans
 		BoxDescription.Text = text or "Box"
@@ -368,7 +372,8 @@ function library:Window(name)
 		Window.Size = UDim2.new(0, 200, 0, sizes[winCount] + 10)
 
 		listOffset[winCount] = listOffset[winCount] + offset
-
+		
+		local Folder = instanceNew("Folder")
 		local Slider = instanceNew("Frame")
 		local SliderButton = instanceNew("Frame")
 		local Description = instanceNew("TextLabel")
@@ -413,14 +418,18 @@ function library:Window(name)
 				callback(math.round(value))
 			end
 		end
-
+		
+		Folder.Name = "Slider"
+		Folder.Parent = Window
+		
 		Slider.Name = "Slider"
-		Slider.Parent = Window
+		Slider.Parent = Folder
 		Slider.BackgroundColor3 = Color3.fromRGB(47, 54, 64)
 		Slider.BorderSizePixel = Color3.fromRGB(113, 128, 147)
 		Slider.Position = UDim2.new(0, 13, 0, listOffset[winCount])
 		Slider.Size = UDim2.new(0, 180, 0, 6)
 		Slider.ZIndex = 2 + zindex
+		Slider.Active = true
 		spawn(function()
 			connect(Slider.InputBegan, SliderMovement) 
 			connect(Slider.InputEnded, SliderEnd)
@@ -433,15 +442,16 @@ function library:Window(name)
 		SliderButton.BorderSizePixel = 0
 		SliderButton.Size = UDim2.new(0, 6, 0, 22)
 		SliderButton.ZIndex = 3 + zindex
+		Slider.Active = true
 		spawn(function()
 			connect(SliderButton.InputBegan, SliderMovement)
 			connect(SliderButton.InputEnded, SliderEnd)	
-		end
+		end)
 
 		Current.Name = "Current"
 		Current.Parent = SliderButton
 		Current.BackgroundTransparency = 1.000
-		Current.Position = UDim2.new(0, 3, 0, 22   )
+		Current.Position = UDim2.new(0, 3, 0, 22)
 		Current.Size = UDim2.new(0, 0, 0, 18)
 		Current.Font = Enum.Font.SourceSans
 		Current.Text = tostring(default)
