@@ -207,8 +207,8 @@ function library:Window(name)
 		Button.Parent = Window
 		Button.BackgroundColor3 = Color3.fromRGB(53, 59, 72)
 		Button.BorderSizePixel = 0
-		Button.Position = UDim2.new(0, 12, 0, listOffset[winCount])
-		Button.Size = UDim2.new(0, 182, 0, 26)
+		Button.Position = UDim2.new(0, 0, 0, listOffset[winCount])
+		Button.Size = UDim2.new(0, 200, 0, 26)
 		Button.ZIndex = 2 + zindex
 		Button.Selected = true
 		Button.Font = Enum.Font.SourceSans
@@ -269,7 +269,7 @@ function library:Window(name)
 		ToggleDescription.Parent = Window
 		ToggleDescription.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		ToggleDescription.BackgroundTransparency = 1.000
-		ToggleDescription.Position = UDim2.new(0, 14, 0, listOffset[winCount])
+		ToggleDescription.Position = UDim2.new(0, 10, 0, listOffset[winCount])
 		ToggleDescription.Size = UDim2.new(0, 131, 0, 26)
 		ToggleDescription.Font = Enum.Font.SourceSans
 		ToggleDescription.Text = text or "Toggle"
@@ -338,8 +338,8 @@ function library:Window(name)
 		BoxDescription.Parent = TextBox
 		BoxDescription.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		BoxDescription.BackgroundTransparency = 1.000
-		BoxDescription.Position = UDim2.new(-0.894736826, 0, 0, 0)
-		BoxDescription.Size = UDim2.new(0, 75, 0, 26)
+		BoxDescription.Position = UDim2.new(0, 10, 0, 0)
+		BoxDescription.Size = UDim2.new(0, 131, 0, 26)
 		BoxDescription.Font = Enum.Font.SourceSans
 		BoxDescription.Text = text or "Box"
 		BoxDescription.TextColor3 = Color3.fromRGB(245, 246, 250)
