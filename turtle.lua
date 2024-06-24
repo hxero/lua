@@ -126,7 +126,7 @@ function library:Window(name)
 
 	UiWindow.Name = "UiWindow"
 	UiWindow.Parent = TurtleUiLib
-	UiWindow.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
+	UiWindow.BackgroundColor3 = _G.UI_HeaderColor
 	UiWindow.BorderSizePixel = 0
 	UiWindow.Position = UDim2.new(0, xOffset, 0, 20)
 	UiWindow.Size = UDim2.new(0, 207, 0, 33)
