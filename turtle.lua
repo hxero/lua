@@ -163,7 +163,7 @@ function library:Window(name)
 	Minimise.Name = "Minimise"
 	Minimise.Parent = Header
 	Minimise.BackgroundColor3 = Color3.fromRGB(0, 168, 255)
-	Minimise.BorderColor3 = Color3.fromRGB(0, 168, 255)
+	Minimise.BackgroundTransparency = 1
 	Minimise.Position = UDim2.new(0, 185, 0, 2)
 	Minimise.Size = UDim2.new(0, 22, 0, 22)
 	Minimise.ZIndex = 7 + zindex
