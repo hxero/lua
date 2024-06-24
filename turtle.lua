@@ -133,7 +133,7 @@ function library:Window(name)
 	UiWindow.ZIndex = 4 + zindex
 	UiWindow.Active = true
 	Dragify(UiWindow)
-	connect(run.RenderStepped, function()
+	connect(runService.RenderStepped, function()
 		UiWindow.BackgroundColor3 = _G.UI_HeaderColor
 	end)
 
