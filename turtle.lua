@@ -337,8 +337,8 @@ function library:Window(name)
 		BoxDescription.Parent = TextBox
 		BoxDescription.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		BoxDescription.BackgroundTransparency = 1.000
-		BoxDescription.Position = UDim2.new(0, 10, 0, 0)
-		BoxDescription.Size = UDim2.new(0, 131, 0, 26)
+		BoxDescription.Position = UDim2.new(0, 200-99-10, 0, 0)
+		BoxDescription.Size = UDim2.new(0, 200, 0, 26)
 		BoxDescription.Font = Enum.Font.SourceSans
 		BoxDescription.Text = text or "Box"
 		BoxDescription.TextColor3 = Color3.fromRGB(245, 246, 250)
@@ -544,7 +544,7 @@ function library:Window(name)
 		DownSign.Position = UDim2.new(0, 155, 0, 2)
 		DownSign.Size = UDim2.new(0, 27, 0, 22)
 		DownSign.Font = Enum.Font.SourceSans
-		DownSign.Text = "^"
+		DownSign.Text = "↑"
 		DownSign.TextColor3 = Color3.fromRGB(220, 221, 225)
 		DownSign.TextSize = 20.000
 		DownSign.ZIndex = 4 + zindex
