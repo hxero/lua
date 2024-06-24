@@ -341,7 +341,7 @@ function library:Window(name)
 		BoxDescription.Parent = Folder
 		BoxDescription.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		BoxDescription.BackgroundTransparency = 1.000
-		BoxDescription.Position = UDim2.new(0, 0, 0, 0)
+		BoxDescription.Position = UDim2.new(1, 0, 0, 0)
 		BoxDescription.Size = UDim2.new(0, 200, 0, 26)
 		BoxDescription.Font = Enum.Font.SourceSans
 		BoxDescription.Text = text or "Box"
@@ -427,7 +427,7 @@ function library:Window(name)
 		Slider.BackgroundColor3 = Color3.fromRGB(47, 54, 64)
 		Slider.BorderSizePixel = Color3.fromRGB(113, 128, 147)
 		Slider.Position = UDim2.new(0, 13, 0, listOffset[winCount])
-		Slider.Size = UDim2.new(0, 180, 0, 6)
+		Slider.Size = UDim2.new(1, 0, 0, 20)
 		Slider.ZIndex = 2 + zindex
 		Slider.Active = true
 		spawn(function()
@@ -440,7 +440,7 @@ function library:Window(name)
 		SliderButton.Parent = Slider
 		SliderButton.BackgroundColor3 = Color3.fromRGB(53, 59, 72)
 		SliderButton.BorderSizePixel = 0
-		SliderButton.Size = UDim2.new(0, 6, 0, 22)
+		SliderButton.Size = UDim2.new(0, 5, 0, 0)
 		SliderButton.ZIndex = 3 + zindex
 		Slider.Active = true
 		spawn(function()
