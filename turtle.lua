@@ -127,7 +127,7 @@ function library:Window(name)
 	UiWindow.Name = "UiWindow"
 	UiWindow.Parent = TurtleUiLib
 	UiWindow.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-	UiWindow.BorderSize = 0
+	UiWindow.Bordersize = 0
 	UiWindow.Position = UDim2.new(0, xOffset, 0, 20)
 	UiWindow.Size = UDim2.new(0, 207, 0, 25)
 	UiWindow.ZIndex = 4 + zindex
@@ -140,7 +140,7 @@ function library:Window(name)
 	Header.Name = "Header"
 	Header.Parent = UiWindow
 	Header.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	Header.BorderSize = 0
+	Header.Bordersize = 0
 	Header.Position = UDim2.new(0, 0, -0.0202544238, 0)
 	Header.Size = UDim2.new(0, 207, 0, 20)
 	Header.ZIndex = 5 + zindex
