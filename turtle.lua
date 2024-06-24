@@ -199,7 +199,7 @@ function library:Window(name)
 		local callback = callback or function() end
 
 		sizes[winCount] = sizes[winCount] + 32
-		Window.Size = UDim2.new(0, 207, 0, sizes[winCount] + 10)
+		Window.Size = UDim2.new(0, 200, 0, sizes[winCount] + 10)
 
 		local Button = instanceNew("TextButton")
 		listOffset[winCount] = listOffset[winCount] + 32
@@ -225,7 +225,7 @@ function library:Window(name)
 		local color = color or Color3.fromRGB(220, 221, 225)
 
 		sizes[winCount] = sizes[winCount] + 32
-		Window.Size = UDim2.new(0, 207, 0, sizes[winCount] + 10)
+		Window.Size = UDim2.new(0, 200, 0, sizes[winCount] + 10)
 
 		listOffset[winCount] = listOffset[winCount] + 32
 		local Label = instanceNew("TextLabel")
@@ -235,7 +235,7 @@ function library:Window(name)
 		Label.BackgroundTransparency = 1.000
 		Label.BorderSizePixel = 0
 		Label.Position = UDim2.new(0, 0, 0, listOffset[winCount])
-		Label.Size = UDim2.new(0, 206, 0, 29)
+		Label.Size = UDim2.new(0, 200, 0, 29)
 		Label.Font = Enum.Font.SourceSans
 		Label.Text = text or "Label"
 		Label.TextSize = 16.000
@@ -257,7 +257,7 @@ function library:Window(name)
 		local callback = callback or function() end
 
 		sizes[winCount] = sizes[winCount] + 32
-		Window.Size = UDim2.new(0, 207, 0, sizes[winCount] + 10)
+		Window.Size = UDim2.new(0, 200, 0, sizes[winCount] + 10)
 
 		listOffset[winCount] = listOffset[winCount] + 32
 
@@ -283,7 +283,7 @@ function library:Window(name)
 		ToggleButton.Parent = ToggleDescription
 		ToggleButton.BackgroundColor3 = Color3.fromRGB(47, 54, 64)
 		ToggleButton.BorderSizePixel = 0
-		ToggleButton.Position = UDim2.new(1.2061069, 0, 0.0769230798, 0)
+		ToggleButton.Position = UDim2.new(1.2001069, 0, 0.0769230798, 0)
 		ToggleButton.Size = UDim2.new(0, 22, 0, 22)
 		ToggleButton.Font = Enum.Font.SourceSans
 		ToggleButton.Text = ""
@@ -309,7 +309,7 @@ function library:Window(name)
 		local callback = callback or function() end
 
 		sizes[winCount] = sizes[winCount] + 32
-		Window.Size = UDim2.new(0, 207, 0, sizes[winCount] + 10)
+		Window.Size = UDim2.new(0, 200, 0, sizes[winCount] + 10)
 
 		listOffset[winCount] = listOffset[winCount] + 32
 		local TextBox = instanceNew("TextBox")
@@ -366,7 +366,7 @@ function library:Window(name)
 		end
 
 		sizes[winCount] = sizes[winCount] + offset
-		Window.Size = UDim2.new(0, 207, 0, sizes[winCount] + 10)
+		Window.Size = UDim2.new(0, 200, 0, sizes[winCount] + 10)
 
 		listOffset[winCount] = listOffset[winCount] + offset
 
@@ -505,7 +505,7 @@ function library:Window(name)
 		local DropdownFrame = instanceNew("ScrollingFrame")
 
 		sizes[winCount] = sizes[winCount] + 32
-		Window.Size = UDim2.new(0, 207, 0, sizes[winCount] + 10)
+		Window.Size = UDim2.new(0, 200, 0, sizes[winCount] + 10)
 
 		listOffset[winCount] = listOffset[winCount] + 32
 
@@ -645,7 +645,7 @@ function library:Window(name)
 		local BlackOverlay = instanceNew("ImageLabel")
 
 		sizes[winCount] = sizes[winCount] + 32
-		Window.Size = UDim2.new(0, 207, 0, sizes[winCount] + 10)
+		Window.Size = UDim2.new(0, 200, 0, sizes[winCount] + 10)
 
 		listOffset[winCount] = listOffset[winCount] + 32
 
