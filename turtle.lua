@@ -13,7 +13,6 @@ local findFirstChild = game.FindFirstChild;
 local destroy, clone = game.Destroy, game.Clone;
 
 local instanceNew = Instance.new
-local Color3.fromRGB, Color3.fromHSV = Color3.Color3.fromRGB, Color3.Color3.fromHSV
 
 local getService = function(s)
 	return cloneref(service(game, s))
