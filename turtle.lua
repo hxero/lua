@@ -136,8 +136,6 @@ function library:Window(name)
 	connect(run.RenderStepped, function()
 		UiWindow.BackgroundColor3 = _G.UI_HeaderColor
 	end)
-	
-	UiWindow.BackgroundColor3 = _G.UI_HeaderColor
 
 	xOffset = xOffset + 230
 
