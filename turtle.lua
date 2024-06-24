@@ -130,7 +130,7 @@ function library:Window(name)
 	UiWindow.BackgroundColor3 = fromRGB(0, 151, 230)
 	UiWindow.BorderColor3 = fromRGB(0, 151, 230)
 	UiWindow.Position = UDim2.new(0, xOffset, 0, 20)
-	UiWindow.Size = UDim2.new(0, 207, 0, 100)
+	UiWindow.Size = UDim2.new(0, 207, 0, 33)
 	UiWindow.ZIndex = 4 + zindex
 	UiWindow.Active = true
 	Dragify(UiWindow)
@@ -140,7 +140,7 @@ function library:Window(name)
 	local Header = instanceNew("Frame")
 	Header.Name = "Header"
 	Header.Parent = UiWindow
-	Header.BackgroundColor3 = fromRGB(0, 168, 255)
+	Header.BackgroundColor3 = fromRGB(0, 0, 255)
 	Header.BorderColor3 = fromRGB(0, 168, 255)
 	Header.Position = UDim2.new(0, 0, -0.0202544238, 0)
 	Header.Size = UDim2.new(0, 207, 0, 26)
