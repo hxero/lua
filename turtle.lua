@@ -71,9 +71,9 @@ function Dragify(obj)
 						isdragging = false;
 					end;
 				end);
-		end;
-	end);
-end)
+			end;
+		end);
+	end)
 end
 
 -- Instances:
@@ -378,36 +378,34 @@ function library:Window(name)
 		local Max = instanceNew("TextLabel")
 
 		function SliderMovement(input)
-			spawn(function()
-				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-					isdragging = true;
-					minitial = input.Position.X;
-					initial = SliderButton.Position.X.Offset;
-					local delta1 = SliderButton.AbsolutePosition.X - initial
-					local con;
-					con = connect(stepped, function()
-						if isdragging then
-							local xOffset = mouse.X - delta1 - 3
-							if xOffset > 175 then
-								xOffset = 175
-							elseif xOffset< 0 then
-								xOffset = 0
-							end
-							SliderButton.Position = UDim2.new(0, xOffset , -1.33333337, 0);
-							SilderFiller.Size = UDim2.new(0, xOffset, 0, 6)
-							local value = Lerp(min, max, SliderButton.Position.X.Offset/(Slider.Size.X.Offset-5))
-							Current.Text = tostring(math.round(value))
-						else
-							disconnect(con);
-						end;
-					end);
-					connect(input.Changed, function()
-						if input.UserInputState == Enum.UserInputState.End then
-							isdragging = false;
-						end;
-					end);
-				end;
-			end)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				isdragging = true;
+				minitial = input.Position.X;
+				initial = SliderButton.Position.X.Offset;
+				local delta1 = SliderButton.AbsolutePosition.X - initial
+				local con;
+				con = connect(stepped, function()
+					if isdragging then
+						local xOffset = mouse.X - delta1 - 3
+						if xOffset > 175 then
+							xOffset = 175
+						elseif xOffset< 0 then
+							xOffset = 0
+						end
+						SliderButton.Position = UDim2.new(0, xOffset , -1.33333337, 0);
+						SilderFiller.Size = UDim2.new(0, xOffset, 0, 6)
+						local value = Lerp(min, max, SliderButton.Position.X.Offset/(Slider.Size.X.Offset-5))
+						Current.Text = tostring(math.round(value))
+					else
+						disconnect(con);
+					end;
+				end);
+				connect(input.Changed, function()
+					if input.UserInputState == Enum.UserInputState.End then
+						isdragging = false;
+					end;
+				end);
+			end;
 		end
 		function SliderEnd(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -423,8 +421,10 @@ function library:Window(name)
 		Slider.Position = UDim2.new(0, 13, 0, listOffset[winCount])
 		Slider.Size = UDim2.new(0, 180, 0, 6)
 		Slider.ZIndex = 2 + zindex
-		connect(Slider.InputBegan, SliderMovement) 
-		connect(Slider.InputEnded, SliderEnd)	  
+		spawn(function()
+			connect(Slider.InputBegan, SliderMovement) 
+			connect(Slider.InputEnded, SliderEnd)
+		end)
 
 		SliderButton.Position = UDim2.new(0, (Slider.Size.X.Offset - 5) * ((default - min)/(max-min)), -1.333337, 0)
 		SliderButton.Name = "SliderButton"
@@ -433,8 +433,10 @@ function library:Window(name)
 		SliderButton.BorderSizePixel = 0
 		SliderButton.Size = UDim2.new(0, 6, 0, 22)
 		SliderButton.ZIndex = 3 + zindex
-		connect(SliderButton.InputBegan, SliderMovement)
-		connect(SliderButton.InputEnded, SliderEnd)	
+		spawn(function()
+			connect(SliderButton.InputBegan, SliderMovement)
+			connect(SliderButton.InputEnded, SliderEnd)	
+		end
 
 		Current.Name = "Current"
 		Current.Parent = SliderButton
