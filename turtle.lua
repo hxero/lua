@@ -314,7 +314,7 @@ function library:Window(name)
 		local TextBox = instanceNew("TextBox")
 		local BoxDescription = instanceNew("TextLabel")
 		TextBox.Parent = Window
-		TextBox.BackgroundColor3 = Color3.fromRGB(53, 59, 72)
+		TextBox.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
 		TextBox.BorderSizePixel = 0
 		TextBox.Position = UDim2.new(0, 99, 0, listOffset[winCount])
 		TextBox.Size = UDim2.new(0, 95, 0, 26)
