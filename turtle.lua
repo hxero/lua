@@ -426,7 +426,7 @@ function library:Window(name)
 		Slider.Parent = Folder
 		Slider.BackgroundColor3 = Color3.fromRGB(47, 54, 64)
 		Slider.BorderSizePixel = Color3.fromRGB(113, 128, 147)
-		Slider.Position = UDim2.new(0, 13, 0, listOffset[winCount])
+		Slider.Position = UDim2.new(0, 0, 0, listOffset[winCount])
 		Slider.Size = UDim2.new(1, 0, 0, 20)
 		Slider.ZIndex = 2 + zindex
 		Slider.Active = true
@@ -451,8 +451,8 @@ function library:Window(name)
 		Current.Name = "Current"
 		Current.Parent = SliderButton
 		Current.BackgroundTransparency = 1.000
-		Current.Position = UDim2.new(0, 3, 0, 22)
-		Current.Size = UDim2.new(0, 0, 0, 18)
+		Current.Position = UDim2.new(0, 0, 0, 22)
+		Current.Size = UDim2.new(1, 0, 0, 0)
 		Current.Font = Enum.Font.SourceSans
 		Current.Text = tostring(default)
 		Current.TextColor3 = Color3.fromRGB(220, 221, 225)
