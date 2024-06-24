@@ -397,8 +397,8 @@ function library:Window(name)
 						elseif xOffset< 0 then
 							xOffset = 0
 						end
-						SliderButton.Position = UDim2.new(0, xOffset , -1.33333337, 0);
-						SilderFiller.Size = UDim2.new(0, xOffset, 0, 6)
+						SliderButton.Position = UDim2.new(0, xOffset , 0, 0);
+						SilderFiller.Size = UDim2.new(0, xOffset, 0.9, 0)
 						local value = Lerp(min, max, SliderButton.Position.X.Offset/(Slider.Size.X.Offset-5))
 						Current.Text = tostring(math.round(value))
 					else
