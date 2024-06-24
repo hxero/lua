@@ -129,7 +129,7 @@ function library:Window(name)
 	UiWindow.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
 	UiWindow.BorderSize = 0
 	UiWindow.Position = UDim2.new(0, xOffset, 0, 20)
-	UiWindow.Size = UDim2.new(0, 207, 0, 28)
+	UiWindow.Size = UDim2.new(0, 207, 0, 25)
 	UiWindow.ZIndex = 4 + zindex
 	UiWindow.Active = true
 	Dragify(UiWindow)
@@ -142,7 +142,7 @@ function library:Window(name)
 	Header.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 	Header.BorderSize = 0
 	Header.Position = UDim2.new(0, 0, -0.0202544238, 0)
-	Header.Size = UDim2.new(0, 207, 0, 26)
+	Header.Size = UDim2.new(0, 207, 0, 20)
 	Header.ZIndex = 5 + zindex
 
 	local HeaderText = instanceNew("TextLabel")
@@ -151,7 +151,7 @@ function library:Window(name)
 	HeaderText.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 	HeaderText.BackgroundTransparency = 1.000
 	HeaderText.Position = UDim2.new(0, 0, -0.0020698905, 0)
-	HeaderText.Size = UDim2.new(0, 206, 0, 33)
+	HeaderText.Size = UDim2.new(0, 206, 0, 25)
 	HeaderText.ZIndex = 6 + zindex
 	HeaderText.Font = Enum.Font.SourceSans
 	HeaderText.Text = name or "Window"
