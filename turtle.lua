@@ -153,7 +153,7 @@ function library:Window(name)
 	HeaderText.Parent = Header
 	HeaderText.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 	HeaderText.BackgroundTransparency = 1.000
-	HeaderText.Position = UDim2.new(0, 0, 0.2, 0)
+	HeaderText.Position = UDim2.new(0, 0, 0, 1)
 	HeaderText.Size = UDim2.new(0, 200, 0, 33)
 	HeaderText.ZIndex = 6 + zindex
 	HeaderText.Font = Enum.Font.SourceSans
