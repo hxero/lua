@@ -475,7 +475,7 @@ function library:Window(name)
 		SilderFiller.Parent = Slider
 		SilderFiller.BackgroundColor3 = Color3.fromRGB(76, 209, 55)
 		SilderFiller.BorderSizePixel = 0
-		SilderFiller.Size = UDim2.new(0, (Slider.Size.X.Offset - 5) * ((default - min)/(max-min)), 0, 6)
+		SilderFiller.Size = UDim2.new(0, (Slider.Size.X.Offset - 5) * ((default - min)/(max-min)), 0.9, 0)
 		SilderFiller.ZIndex = 2 + zindex
 		SilderFiller.BorderMode = Enum.BorderMode.Inset
 
