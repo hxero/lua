@@ -143,7 +143,7 @@ function library:Window(name)
 	Header.BackgroundColor3 = fromRGB(60, 60, 60)
 	Header.BorderColor3 = fromRGB(0, 168, 255)
 	Header.Position = UDim2.new(0, 0, -0.0202544238, 0)
-	Header.Size = UDim2.new(0, 207, 0, 26)
+	Header.Size = UDim2.new(0, 207, 0, 33)
 	Header.ZIndex = 3 + zindex
 
 	local HeaderText = instanceNew("TextLabel")
