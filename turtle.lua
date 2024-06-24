@@ -133,6 +133,11 @@ function library:Window(name)
 	UiWindow.ZIndex = 4 + zindex
 	UiWindow.Active = true
 	Dragify(UiWindow)
+	connect(run.RenderStepped, function()
+		UiWindow.BackgroundColor3 = _G.UI_HeaderColor
+	end)
+	
+	UiWindow.BackgroundColor3 = _G.UI_HeaderColor
 
 	xOffset = xOffset + 230
 
@@ -142,7 +147,7 @@ function library:Window(name)
 	Header.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 	Header.BorderSizePixel = 0
 	Header.Position = UDim2.new(0, 0, -0.0202544238, 0)
-	Header.Size = UDim2.new(0, 207, 0, 31)
+	Header.Size = UDim2.new(0, 207, 0, 32)
 	Header.ZIndex = 5 + zindex
 
 	local HeaderText = instanceNew("TextLabel")
