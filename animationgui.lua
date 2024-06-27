@@ -40,7 +40,10 @@ mainSec:CreateButton("Destroy UI", function()
 end)
 
 -- animation
-local animations = _G.HXEROAnimations
+local animations = {}
+for i, v in next, _G.HXEROAnimations do
+	animations[#animations + 1] = v
+end
 table.sort(animations)
 
 animSec:CreateDropdown("Package", {table.unpack(animations), "Custom"}, 1, function(value)
