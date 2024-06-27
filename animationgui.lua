@@ -46,7 +46,7 @@ for i, v in next, _G.HXEROAnimations do
 end
 table.sort(animations)
 
-animSec:CreateDropdown("Package", {table.unpack(animations), "Custom"}, 1, function(value)
+animSec:CreateDropdown("Package", {"Custom", table.unpack(animations)}, 1, function(value)
 	_G.HXEROAnimType = value
 end)
 
