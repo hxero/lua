@@ -1,6 +1,7 @@
 -- NOTE: THIS IS FOR PERSONAL USE AND I HAVE A SEPERATE SCRIPT THAT TAKE THE GLOBAL ( _G ) TO EXECUTE THE ACTUAL THING
 -- THIS IS JUST A SILLY UI TO CHANGE THE GLOBAL OPTION FOR A SEPARATE SCRIPT AND WILL NOT WORK WITHOUT IT!1!1!
 
+local oldChat = game.Players.LocalPlayer.PlayerGui:FindFirstChild("Chat")
 local systemMessage = function(msg, color)
 	if oldChat then
 		local properties = props or {
