@@ -26,7 +26,7 @@ end
 -- library
 local library = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/hxero/lua/main/wizard.lua"))();
 local window = library.NewWindow(library, "Hxero's Animation UI");
-local screengui = waitForChild(coreGui, "WizardLibrary");
+local screengui = cloneref(game.GetService(game, "CoreGui")):WaitForChild("WizardLibrary");
 screengui.Name = "hxero-animationgui"
 
 -- sections
