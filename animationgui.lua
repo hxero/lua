@@ -42,7 +42,7 @@ end)
 local animations = _G.HXEROAnimations
 table.sort(animations)
 
-animSec:CreateDropdown("Package", {"Custom", table.unpack(animations)}, 1, function(value)
+animSec:CreateDropdown("Package", {table.unpack(animations), "Custom"}, 1, function(value)
 	_G.HXEROAnimType = value
 end)
 
