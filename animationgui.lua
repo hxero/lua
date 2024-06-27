@@ -42,7 +42,7 @@ end)
 -- animation
 local animations = {}
 for i, v in next, _G.HXEROAnimations do
-	animations[#animations + 1] = v
+	animations[#animations + 1] = i
 end
 table.sort(animations)
 
