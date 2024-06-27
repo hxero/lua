@@ -49,7 +49,8 @@ end)
 
 animSec:CreateButton("Toggle", function()
 	_G.HXEROLoop = not _G.HXEROLoop -- toggle player.CharacterAdded connection for animation to re-run after death
-	systemMessage("R15 Animation ".._G.HXEROLoop and "enabled" or "disabled")
+	local a = _G.HXEROLoop and "enabled" or "disabled"
+	systemMessage("R15 Animation "..a)
 end)
 
 animSec:CreateButton("Save Options", function()
