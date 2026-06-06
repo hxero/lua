@@ -1,28 +1,35 @@
+local escape_map = {
+	["\\"] = "\\\\",
+	['"'] = '\\"',
+	["\n"] = "\\n",
+	["\r"] = "\\r",
+	["\t"] = "\\t",
+	["\0"] = "\\0",
+};
 local function escape(s)
-	return tostring(s)
-		:gsub("\\", "\\\\")
-		:gsub('"', '\\"')
-		:gsub("\n", "\\n")
-		:gsub("\r", "\\r")
-		:gsub("\t", "\\t")
-		:gsub("%z", "\\0");
+	return tostring(s):gsub('[\\"\n\r\t%z]', escape_map);
 end;
 
 local function dump_table(node)
 	local indent_char = "  ";
-
+	local indent_cache = { indent_char, };
 	local cache, stack, output = {}, {}, { "{\n", };
 	local depth = 1;
+
+	local function _indent(d)
+		if (not indent_cache[d]) then
+			indent_cache[d] = string.rep(indent_char, d);
+		end;
+		return indent_cache[d];
+	end;
 
 	while (true) do
 		local keys = {};
 		for k in next, node do
 			keys[#keys + 1] = k;
 		end;
-		local size   = #keys;
-		local start  = cache[node] or 1;
 		local nested = false;
-		for i = start, size, 1 do
+		for i = (cache[node] or 1), #keys, 1 do
 			local k = keys[i];
 			local v = node[k];
 
@@ -31,7 +38,7 @@ local function dump_table(node)
 				and ("[" .. tostring(k) .. "]")
 				or ('["' .. escape(k) .. '"]');
 
-			local indent = string.rep(indent_char, depth);
+			local indent = _indent(depth);
 
 			if (v_type == "table") then
 				nested = true;
@@ -54,7 +61,7 @@ local function dump_table(node)
 
 		if (not nested) then
 			depth = depth - 1;
-			output[#output + 1] = string.rep(indent_char, depth) .. "},\n";
+			output[#output + 1] = _indent(depth) .. "},\n";
 		end;
 
 		if (#stack > 0) then
