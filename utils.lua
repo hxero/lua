@@ -18,7 +18,7 @@ local function dump_table(node)
 
 	local function _indent(d)
 		if (not indent_cache[d]) then
-			indent_cache[d] = string.rep(indent_char, d);
+			indent_cache[d] = _indent(d - 1) .. indent_char;
 		end;
 		return indent_cache[d];
 	end;
