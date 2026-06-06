@@ -12,7 +12,7 @@ end;
 
 local function dump_table(node)
 	local indent_char = "  ";
-	local indent_cache = { indent_char, };
+	local indent_cache = { [0] = "", };
 	local cache, stack, output = {}, {}, { "{\n", };
 	local depth = 1;
 
