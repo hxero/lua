@@ -47,19 +47,6 @@ local function dump_table(node)
 				if (type(__index) == "table") then
 					local sub_keys = get_keys(__index, seen);
 					for _, k in ipairs(sub_keys) do keys[#keys + 1] = k; end;
-				elseif (type(__index) == "function") then
-					local i = 1;
-					while (true) do
-						local name, value = debug.getupvalue(__index, i);
-						if (not name) then break; end;
-						-- possible internal table
-
-						if (type(value) == "table") then
-							local sub_keys = get_keys(value, seen);
-							for _, k in ipairs(sub_keys) do keys[#keys + 1] = k; end;
-						end;
-						i = i + 1;
-					end;
 				end;
 			end;
 		end;
