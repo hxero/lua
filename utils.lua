@@ -11,11 +11,12 @@ local function escape(s)
 end;
 
 local function dump_table(node)
-	local indent_char = "  ";
+	local indent_char  = "  ";
 	local indent_cache = { [0] = "", };
-	local cache, stack, output = {}, {}, { "{\n", };
-	local depth = 1;
 
+	local cache, stack, output = {}, {}, { "{\n", };
+
+	local depth = 1;
 	local function _indent(d)
 		if (not indent_cache[d]) then
 			indent_cache[d] = _indent(d - 1) .. indent_char;
@@ -23,15 +24,56 @@ local function dump_table(node)
 		return indent_cache[d];
 	end;
 
-	while (true) do
+	local function get_keys(obj, seen)
+		seen = seen or {};
+		if (seen[obj]) then return {}; end;
+		seen[obj] = true;
+
 		local keys = {};
-		for k in next, node do
-			keys[#keys + 1] = k;
+		local o_type = type(obj);
+
+		if (o_type == "table") then
+			for k in next, obj do keys[#keys + 1] = k; end;
+			local mt = getmetatable(obj);
+			if mt and mt.__index then
+				local sub = get_keys(mt.__index, seen);
+				for _, k in ipairs(sub) do keys[#keys + 1] = k; end;
+			end;
+		elseif (o_type == "userdata") then
+			keys[#keys + 1] = "COMPUTED PROPERTY";
+			local mt = getmetatable(obj);
+			if (mt and mt.__index) then
+				local __index = mt.__index;
+				if (type(__index) == "table") then
+					local sub_keys = get_keys(__index, seen);
+					for _, k in ipairs(sub_keys) do keys[#keys + 1] = k; end;
+				elseif (type(__index) == "function") then
+					local i = 1;
+					while (true) do
+						local name, value = debug.getupvalue(__index, i);
+						if (not name) then break; end;
+						-- possible internal table
+
+						if (type(value) == "table") then
+							local sub_keys = get_keys(value, seen);
+							for _, k in ipairs(sub_keys) do keys[#keys + 1] = k; end;
+						end;
+						i = i + 1;
+					end;
+				end;
+			end;
 		end;
+
+		return keys;
+	end;
+
+	while (true) do
+		local keys = get_keys(node);
 		local nested = false;
 		for i = (cache[node] or 1), #keys, 1 do
 			local k = keys[i];
-			local v = node[k];
+			local s, v = pcall(function() return node[k]; end);
+			if (not s) then v = "[ERROR INDEXING]"; end;
 
 			local k_type, v_type = type(k), type(v);
 			local key = (k_type == "number" or k_type == "boolean")
@@ -74,3 +116,7 @@ local function dump_table(node)
 
 	return table.concat(output);
 end;
+
+return {
+	dump_table = dump_table,
+};
