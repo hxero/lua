@@ -1,17 +1,14 @@
 local utils = require("utils");
 
-print(utils.dump_table {
-	string = "hello world",
-	value = 21390,
-	nested = {
-		a = 1,
-		b = 2,
-		nesteder = {
-			c = "not\ncool",
-			d = 'my "quote"',
-		},
-	},
-	empty = {},
-	boolean = true,
-	null = "yes\0null",
-});
+local start_init = os.clock();
+local a = {};
+for i = 1, 100000, 1 do
+	a["mycool" .. tostring(i)] = true;
+end;
+local end_init = os.clock() - start_init;
+
+local start_dump = os.clock();
+print(utils.dump_table(
+	a
+));
+print("dumping took " .. os.clock() - start_dump, "\ninitializing table took " .. end_init)
