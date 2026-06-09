@@ -1,3 +1,8 @@
+local type, tostring, next, getmetatable =
+	type, tostring, next, getmetatable;
+local rep, sort, concat, gsub =
+	string.rep, table.sort, table.concat, string.gsub;
+
 local escape_map = {
 	["\\"] = "\\\\",
 	['"'] = '\\"',
@@ -7,24 +12,58 @@ local escape_map = {
 	["\0"] = "\\0",
 };
 local function escape(s)
-	return tostring(s):gsub('[\\"\n\r\t%z]', escape_map);
+	return gsub(tostring(s), '[\\"\n\r\t%z]', escape_map);
+end;
+
+local type_order = {
+	number       = 1,
+	string       = 2,
+	boolean      = 3,
+	table        = 4,
+	userdata     = 5,
+	["function"] = 6,
+	thread       = 7,
+};
+
+local function sorter(a, b)
+	local a_type, b_type = type(a), type(b);
+	if (a_type ~= b_type) then
+		return (type_order[a_type] or 8) < (type_order[b_type] or 8);
+	end;
+	return a < b;
 end;
 
 local function dump_table(node, opt)
-	local indent_char = opt.indent or "  ";
-	local indent_cache = setmetatable({}, {
+	if (type(node) ~= "table") then return tostring(node); end;
+	opt = opt or {};
+
+	local indent_char  = opt.indent or "  ";
+	local indent_cache = setmetatable({ [0] = "", }, {
 		__index = function(t, k)
-			local res = string.rep(indent_char, k);
+			local res = rep(indent_char, k);
 			t[k] = res;
 			return res;
 		end,
 	});
 
-	local cache, stack, output = {}, {}, { "{\n", };
-	local output_len = 1;
-	local depth = 1;
+	local close_cache = setmetatable({ [0] = "},\n", }, {
+		__index = function(t, k)
+			local res = indent_cache[k] .. "},\n";
+			t[k] = res;
+			return res;
+		end,
+	});
 
-	local keys_buf = {};
+	local node_keys = {};
+	local node_i    = {};
+
+	local cache, stack, output = {}, {}, { "{\n", };
+
+	local output_len = 1;
+	local stack_len  = 0;
+	local depth      = 1;
+
+	local sorted = opt.sorted;
 
 	local function get_keys(obj)
 		local type_obj = type(obj);
@@ -35,83 +74,79 @@ local function dump_table(node, opt)
 			return {};
 		end;
 
+		local keys = {};
 		local len = 0;
 		for k in next, obj do
 			len = len + 1;
-			keys_buf[len] = k;
+			keys[len] = k;
 		end;
 
 		local mt = getmetatable(obj);
-		if (mt and type(mt.__index) == "table") then
-			for k in next, mt.__index do
-				len = len + 1;
-				keys_buf[len] = k;
+		if (mt) then
+			local __index = mt.__index;
+			if (type(__index) == "table") then
+				for k in next, __index do
+					len = len + 1;
+					keys[len] = k;
+				end;
 			end;
 		end;
 
-		if (not opt.sorted) then
-			local keys = keys_buf;
-			keys_buf = {};
-			return keys;
-		end
-
-		if (len <= 1) then
-			if (len == 1) then
-				local single = { keys_buf[1], };
-				keys_buf[1] = nil;
-				return single;
-			end;
-			return {};
+		if (sorted and len > 1) then
+			sort(keys, sorter);
 		end;
 
-		table.sort(keys_buf);
-
-		local sorted_keys = {};
-		for i = 1, len, 1 do
-			sorted_keys[i] = keys_buf[i];
-			keys_buf[i] = nil;
-		end;
-
-		return sorted_keys;
+		return keys;
 	end;
 
 	while (node) do
-		if (not cache[node]) then
-			cache[node] = { k = get_keys(node), i = 1, };
+		local keys = node_keys[node];
+		if (not keys) then
+			keys = get_keys(node);
+			node_keys[node] = keys;
+			node_i[node] = 1;
 		end;
 
-		local state = cache[node];
-		local keys = state.k;
 		local nested = false;
 
-		for i = state.i, #keys do
+		local keys_len = #keys;
+		local indent = indent_cache[depth];
+
+		local start = node_i[node];
+
+		for i = start, keys_len, 1 do
 			local k = keys[i];
 			local v = node[k];
 
 			local k_type, v_type = type(k), type(v);
 			local key_str;
-			if k_type == "number" or k_type == "boolean" then
+			if (k_type == "number" or k_type == "boolean") then
 				key_str = "[" .. tostring(k) .. "]";
 			else
 				key_str = '["' .. escape(k) .. '"]';
 			end;
 
-			local indent = indent_cache[depth];
-
 			if (v_type == "table" and not cache[v]) then
 				output_len = output_len + 1;
 				output[output_len] = indent .. key_str .. " = {\n";
 
-				state.i = i + 1;
-				stack[#stack + 1] = node;
+				node_i[node] = i + 1;
+
+				stack_len = stack_len + 1;
+				stack[stack_len] = node;
+
 				node = v;
 				depth = depth + 1;
 				nested = true;
 				break;
 			else
-				local val_str = (v_type == "number" or v_type == "boolean")
-					and tostring(v)
-					or ('"' .. escape(tostring(v)) .. '"');
+				local val_str;
+				if (v_type ~= "string") then
+					val_str = tostring(v);
+				else
+					val_str = '"' .. escape(v) .. '"';
+				end;
+
 				output_len = output_len + 1;
 				output[output_len] = indent .. key_str .. " = " .. val_str .. ",\n";
 			end;
@@ -119,13 +154,20 @@ local function dump_table(node, opt)
 
 		if (not nested) then
 			output_len = output_len + 1;
-			output[output_len] = indent_cache[depth - 1] .. "},\n";
+			output[output_len] = close_cache[depth - 1];
 			depth = depth - 1;
-			node = table.remove(stack);
+
+			if (stack_len > 0) then
+				node = stack[stack_len];
+				stack[stack_len] = nil;
+				stack_len = stack_len - 1;
+			else
+				node = nil;
+			end;
 		end;
 	end;
 
-	return table.concat(output);
+	return concat(output);
 end;
 
 return {
