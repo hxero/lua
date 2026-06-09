@@ -25,7 +25,9 @@ local function dump_table(root)
 	local out_n = 1;
 	local visited = { [root] = true, };
 
-	-- may 'stackoverflow' on tables too deep but, you rarely see a too deep table, otherwise you have other problem to worry about
+	-- may 'stackoverflow' on tables too deep but,
+	-- you rarely see a too deep table,
+	-- otherwise you have other problem to worry about
 	local function dump(t, depth)
 		local child_depth = depth + 1;
 		local child_indent = INDENT_CACHE[child_depth] or string.rep("  ", child_depth);
@@ -41,7 +43,7 @@ local function dump_table(root)
 				out_n = out_n + 1;
 				if v_type == "string" then
 					out[out_n] = child_indent ..
-					k_str .. ' = "' .. (find(v, escape_match) and gsub(v, escape_match, escape_map) or v) .. '",\n';
+							k_str .. ' = "' .. (find(v, escape_match) and gsub(v, escape_match, escape_map) or v) .. '",\n';
 				elseif v_type == "number" then
 					out[out_n] = child_indent .. k_str .. " = " .. v .. ",\n";
 				elseif v_type == "boolean" then
@@ -72,7 +74,7 @@ local function dump_table(root)
 						prefix = child_indent .. k .. " = ";
 					else
 						prefix = child_indent ..
-						'["' .. (find(k, escape_match) and gsub(k, escape_match, escape_map) or k) .. '"] = ';
+								'["' .. (find(k, escape_match) and gsub(k, escape_match, escape_map) or k) .. '"] = ';
 					end;
 				elseif k_type == "number" then
 					prefix = child_indent .. (INT_KEY_CACHE[k] or ("[" .. k .. "]")) .. " = ";
@@ -84,7 +86,7 @@ local function dump_table(root)
 				out_n = out_n + 1;
 				if v_type == "string" then
 					out[out_n] = prefix ..
-					'"' .. (find(v, escape_match) and gsub(v, escape_match, escape_map) or v) .. '"' .. ",\n";
+							'"' .. (find(v, escape_match) and gsub(v, escape_match, escape_map) or v) .. '"' .. ",\n";
 				elseif v_type == "number" then
 					out[out_n] = prefix .. v .. ",\n";
 				elseif v_type == "boolean" then

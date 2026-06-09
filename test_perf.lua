@@ -1,4 +1,4 @@
-local utils = require("utils");
+local utils = require("utils").dump_table;
 
 local a = {
 	1, 2,
@@ -6,5 +6,5 @@ local a = {
 };
 
 local start_dump = os.clock();
-print(utils.dump_table(a));
+print(utils(a));
 print("dumping took " .. os.clock() - start_dump)
