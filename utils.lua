@@ -43,11 +43,14 @@ local function dump_table(root)
 				out_n = out_n + 1;
 				if (v_type == "string") then
 					out[out_n] = child_indent ..
-							k_str .. ' = "' .. (find(v, escape_match) and gsub(v, escape_match, escape_map) or v) .. '",\n';
+							k_str .. ' = "' .. (find(v, escape_match)
+								and gsub(v, escape_match, escape_map) or v) .. '",\n';
 				elseif (v_type == "number") then
-					out[out_n] = child_indent .. k_str .. " = " .. v .. ",\n";
+					out[out_n] =
+							child_indent .. k_str .. " = " .. v .. ",\n";
 				elseif (v_type == "boolean") then
-					out[out_n] = child_indent .. k_str .. (v and " = true,\n" or " = false,\n");
+					out[out_n] =
+							child_indent .. k_str .. (v and " = true,\n" or " = false,\n");
 				elseif (v_type == "table") then
 					if (visited[v]) then
 						out[out_n] = child_indent .. k_str .. ' = "<cycle>",\n';
@@ -59,7 +62,8 @@ local function dump_table(root)
 						out[out_n] = child_indent .. "},\n";
 					end;
 				else
-					out[out_n] = child_indent .. k_str .. ' = "<' .. tostring(v) .. '>",\n';
+					out[out_n] =
+							child_indent .. k_str .. ' = "<' .. tostring(v) .. '>",\n';
 				end;
 			end;
 		end;
@@ -74,7 +78,8 @@ local function dump_table(root)
 						prefix = child_indent .. k .. " = ";
 					else
 						prefix = child_indent ..
-								'["' .. (find(k, escape_match) and gsub(k, escape_match, escape_map) or k) .. '"] = ';
+								'["' .. (find(k, escape_match)
+									and gsub(k, escape_match, escape_map) or k) .. '"] = ';
 					end;
 				elseif (k_type == "number") then
 					prefix = child_indent .. (INT_KEY_CACHE[k] or ("[" .. k .. "]")) .. " = ";
@@ -86,7 +91,8 @@ local function dump_table(root)
 				out_n = out_n + 1;
 				if (v_type == "string") then
 					out[out_n] = prefix ..
-							'"' .. (find(v, escape_match) and gsub(v, escape_match, escape_map) or v) .. '"' .. ",\n";
+							'"' .. (find(v, escape_match)
+								and gsub(v, escape_match, escape_map) or v) .. '"' .. ",\n";
 				elseif (v_type == "number") then
 					out[out_n] = prefix .. v .. ",\n";
 				elseif (v_type == "boolean") then

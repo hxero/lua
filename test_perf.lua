@@ -1,4 +1,4 @@
-local utils = require("utils").dump_table;
+local utils = require("inspect");
 
 local a = {
 	1, 2,
