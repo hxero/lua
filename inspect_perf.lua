@@ -26,43 +26,43 @@ end;
 -------------------
 
 time('nil', N, function()
-	inspect(nil, { sorted = true, });
+	inspect(nil);
 end);
 
 time('string', N, function()
-	inspect("hello", { sorted = true, });
+	inspect("hello");
 end);
 
 local e = {};
 time('empty', N, function()
-	inspect(e, { sorted = true, });
+	inspect(e);
 end);
 
 local seq = { 1, 2, 3, 4, };
 time('sequence', N, function()
-	inspect(seq, { sorted = true, });
+	inspect(seq);
 end);
 
 local record = { a = 1, b = 2, c = 3, };
 time('record', N, function()
-	inspect(record, { sorted = true, });
+	inspect(record);
 end);
 
 local hybrid = { 1, 2, 3, a = 1, b = 2, c = 3, };
 time('hybrid', N, function()
-	inspect(hybrid, { sorted = true, });
+	inspect(hybrid);
 end);
 
 local recursive = {};
 recursive.x = recursive;
 time('recursive', N, function()
-	inspect(recursive, { sorted = true, });
+	inspect(recursive);
 end);
 
 local with_meta = setmetatable({},
 	{ __tostring = function() return "s"; end, });
 time('meta', N, function()
-	inspect(with_meta, { sorted = true, });
+	inspect(with_meta);
 end);
 
 -- local process_options = {
@@ -82,7 +82,7 @@ local complex = {
 complex.x = complex;
 setmetatable(complex, complex);
 time('complex', N, function()
-	inspect(complex, { sorted = true, });
+	inspect(complex);
 end);
 
 local big = {};
@@ -93,7 +93,7 @@ for i = 1, 1000 do
 	big["a" .. i] = 1;
 end;
 time('big', N / 100, function()
-	inspect(big, { sorted = true, });
+	inspect(big);
 end);
 
 ------

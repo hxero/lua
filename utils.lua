@@ -1,7 +1,6 @@
-local type, tostring, next, getmetatable =
-	type, tostring, next, getmetatable;
-local rep, sort, concat, gsub =
-	string.rep, table.sort, table.concat, string.gsub;
+local type, tostring, next = type, tostring, next;
+local concat = table.concat;
+local match, gsub, find = string.match, string.gsub, string.find;
 
 local escape_map = {
 	["\\"] = "\\\\",
@@ -11,165 +10,108 @@ local escape_map = {
 	["\t"] = "\\t",
 	["\0"] = "\\0",
 };
-local function escape(s)
-	return gsub(tostring(s), '[\\"\n\r\t%z]', escape_map);
-end;
+local escape_match = '[\\"\n\r\t%z]';
 
-local type_order = {
-	number       = 1,
-	string       = 2,
-	boolean      = 3,
-	table        = 4,
-	userdata     = 5,
-	["function"] = 6,
-	thread       = 7,
-};
+local INT_KEY_CACHE = {};
+for i = 1, 2048 do INT_KEY_CACHE[i] = "[" .. i .. "]"; end;
 
-local function sorter(a, b)
-	local a_type, b_type = type(a), type(b);
-	if (a_type ~= b_type) then
-		return (type_order[a_type] or 8) < (type_order[b_type] or 8);
-	end;
-	return a < b;
-end;
+local INDENT_CACHE = { [0] = "", };
+for i = 1, 64 do INDENT_CACHE[i] = INDENT_CACHE[i - 1] .. "  "; end;
 
-local function dump_table(node, opt)
-	if (type(node) ~= "table") then return tostring(node); end;
-	opt = opt or {};
+local function dump_table(root)
+	if type(root) ~= "table" then return tostring(root); end;
 
-	local indent_char  = opt.indent or "  ";
-	local indent_cache = setmetatable({ [0] = "", }, {
-		__index = function(t, k)
-			local res = rep(indent_char, k);
-			t[k] = res;
-			return res;
-		end,
-	});
+	local out = { "{\n", };
+	local out_n = 1;
+	local visited = { [root] = true, };
 
-	local close_cache = setmetatable({ [0] = "},\n", }, {
-		__index = function(t, k)
-			local res = indent_cache[k] .. "},\n";
-			t[k] = res;
-			return res;
-		end,
-	});
+	-- may 'stackoverflow' on tables too deep but, you rarely see a too deep table, otherwise you have other problem to worry about
+	local function dump(t, depth)
+		local child_depth = depth + 1;
+		local child_indent = INDENT_CACHE[child_depth] or string.rep("  ", child_depth);
 
-	local node_keys = {};
-	local node_i    = {};
+		local len = #t;
 
-	local cache, stack, output = {}, {}, { "{\n", };
+		if len > 0 then
+			for i = 1, len do
+				local v = t[i];
+				local k_str = INT_KEY_CACHE[i] or ("[" .. i .. "]");
+				local v_type = type(v);
 
-	local output_len = 1;
-	local stack_len  = 0;
-	local depth      = 1;
-
-	local sorted = opt.sorted;
-
-	local function get_keys(obj)
-		local type_obj = type(obj);
-		if (type_obj ~= "table") then
-			if (type_obj == "userdata") then
-				return { "COMPUTED PROPERTY", };
-			end;
-			return {};
-		end;
-
-		local keys = {};
-		local len = 0;
-		for k in next, obj do
-			len = len + 1;
-			keys[len] = k;
-		end;
-
-		local mt = getmetatable(obj);
-		if (mt) then
-			local __index = mt.__index;
-			if (type(__index) == "table") then
-				for k in next, __index do
-					len = len + 1;
-					keys[len] = k;
-				end;
-			end;
-		end;
-
-		if (sorted and len > 1) then
-			sort(keys, sorter);
-		end;
-
-		return keys;
-	end;
-
-	while (node) do
-		local keys = node_keys[node];
-		if (not keys) then
-			keys = get_keys(node);
-			node_keys[node] = keys;
-			node_i[node] = 1;
-		end;
-
-		local nested = false;
-
-		local keys_len = #keys;
-		local indent = indent_cache[depth];
-
-		local start = node_i[node];
-
-		for i = start, keys_len, 1 do
-			local k = keys[i];
-			local v = node[k];
-
-			local k_type, v_type = type(k), type(v);
-			local key_str;
-			if (k_type == "number" or k_type == "boolean") then
-				key_str = "[" .. tostring(k) .. "]";
-			else
-				key_str = '["' .. escape(k) .. '"]';
-			end;
-
-			if (v_type == "table" and not cache[v]) then
-				output_len = output_len + 1;
-				output[output_len] = indent .. key_str .. " = {\n";
-
-				node_i[node] = i + 1;
-
-				stack_len = stack_len + 1;
-				stack[stack_len] = node;
-
-				node = v;
-				depth = depth + 1;
-				nested = true;
-				break;
-			else
-				local val_str;
-				if (v_type ~= "string") then
-					val_str = tostring(v);
+				out_n = out_n + 1;
+				if v_type == "string" then
+					out[out_n] = child_indent ..
+					k_str .. ' = "' .. (find(v, escape_match) and gsub(v, escape_match, escape_map) or v) .. '",\n';
+				elseif v_type == "number" then
+					out[out_n] = child_indent .. k_str .. " = " .. v .. ",\n";
+				elseif v_type == "boolean" then
+					out[out_n] = child_indent .. k_str .. (v and " = true,\n" or " = false,\n");
+				elseif v_type == "table" then
+					if visited[v] then
+						out[out_n] = child_indent .. k_str .. ' = "<cycle>",\n';
+					else
+						visited[v] = true;
+						out[out_n] = child_indent .. k_str .. " = {\n";
+						dump(v, child_depth);
+						out_n = out_n + 1;
+						out[out_n] = child_indent .. "},\n";
+					end;
 				else
-					val_str = '"' .. escape(v) .. '"';
+					out[out_n] = child_indent .. k_str .. ' = "<' .. tostring(v) .. '>",\n';
 				end;
-
-				output_len = output_len + 1;
-				output[output_len] = indent .. key_str .. " = " .. val_str .. ",\n";
 			end;
 		end;
 
-		if (not nested) then
-			output_len = output_len + 1;
-			output[output_len] = close_cache[depth - 1];
-			depth = depth - 1;
+		for k, v in next, t do
+			if type(k) ~= "number" or k < 1 or k > len or k % 1 ~= 0 then
+				local k_type = type(k);
+				local prefix;
 
-			if (stack_len > 0) then
-				node = stack[stack_len];
-				stack[stack_len] = nil;
-				stack_len = stack_len - 1;
-			else
-				node = nil;
+				if k_type == "string" then
+					if match(k, "^[_%a][_%a%d]*$") then
+						prefix = child_indent .. k .. " = ";
+					else
+						prefix = child_indent ..
+						'["' .. (find(k, escape_match) and gsub(k, escape_match, escape_map) or k) .. '"] = ';
+					end;
+				elseif k_type == "number" then
+					prefix = child_indent .. (INT_KEY_CACHE[k] or ("[" .. k .. "]")) .. " = ";
+				else
+					prefix = child_indent .. '["<' .. tostring(k) .. '>"] = ';
+				end;
+
+				local v_type = type(v);
+				out_n = out_n + 1;
+				if v_type == "string" then
+					out[out_n] = prefix ..
+					'"' .. (find(v, escape_match) and gsub(v, escape_match, escape_map) or v) .. '"' .. ",\n";
+				elseif v_type == "number" then
+					out[out_n] = prefix .. v .. ",\n";
+				elseif v_type == "boolean" then
+					out[out_n] = prefix .. (v and "true,\n" or "false,\n");
+				elseif v_type == "table" then
+					if visited[v] then
+						out[out_n] = prefix .. '"<cycle>",\n';
+					else
+						visited[v] = true;
+						out[out_n] = prefix .. "{\n";
+						dump(v, child_depth);
+						out_n = out_n + 1;
+						out[out_n] = child_indent .. "},\n";
+					end;
+				else
+					out[out_n] = prefix .. '"<' .. tostring(v) .. '>",\n';
+				end;
 			end;
 		end;
 	end;
 
-	return concat(output);
+	dump(root, 0);
+
+	out_n = out_n + 1;
+	out[out_n] = "}\n";
+
+	return concat(out);
 end;
 
-return {
-	dump_table = dump_table,
-};
+return { dump_table = dump_table, };
