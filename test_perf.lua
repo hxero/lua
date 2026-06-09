@@ -1,3 +1,5 @@
+-- boilerplate for now too lazy
+
 local timer = { {}, };
 timer.__index = timer;
 
