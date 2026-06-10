@@ -1,4 +1,6 @@
--- boilerplate for now too lazy
+local utils      = require("utils");
+local stack_dump = require("_dump");
+local inspect    = require("inspect");
 
 local timer = { {}, };
 timer.__index = timer;
@@ -33,12 +35,21 @@ function timer:print()
 	print(self.name, "took", self.time);
 end;
 
-timer.new("reoksf", function()
-	return "";
+local tbl = { [200] = { true, }, };
+for i = 1, 1e5, 1 do
+	tbl["mycool" .. tostring(i)] = { tbl, [20] = i, {}, };
+end;
+
+timer.new("iteration based", function()
+	return utils.dump_table(tbl, { sort = false });
 end);
 
-timer.new("reoksf", function()
-	return "1";
+timer.new("recursive based", function()
+	return stack_dump.dump_table(tbl, { sort = false });
+end);
+
+timer.new("inspect", function()
+	return inspect(tbl);
 end);
 
 local timers = timer.get_timers();
