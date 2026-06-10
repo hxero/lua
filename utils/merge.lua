@@ -1,5 +1,9 @@
 local type, next = type, next
 
+--- Merge two tables with `from` overriding `into` if identical keys
+--- @param into table<any, any>
+--- @param from table<any, any>
+--- @return table<any, any>
 local function deep_merge(into, from)
 	local stack = {};
 	local stack_top = 0;

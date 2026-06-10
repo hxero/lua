@@ -32,10 +32,14 @@ local function sort_fallback(a, b)
 	return tostring(a) < tostring(b);
 end;
 
-local function dump_table(root, options)
+--- Dump table into readable string
+--- @param root table<any, any>
+--- @param opt? { sort?: boolean } # default: true
+--- @return string
+local function dump_table(root, opt)
 	if (type(root) ~= "table") then return tostring(root); end;
 
-	local sort_keys = options and options.sort;
+	local sort_keys = opt and opt.sort;
 
 	local out = { "{\n", };
 	local out_n = 1;
@@ -208,4 +212,4 @@ local function dump_table(root, options)
 	return concat(out);
 end;
 
-return { dump_table = dump_table, };
+return dump_table;

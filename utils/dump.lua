@@ -32,10 +32,14 @@ local function escape_str(v)
 	return find(v, escape_match) and gsub(v, escape_match, escape_map) or v;
 end;
 
+--- Dump table into readable string
+--- @param root table<any, any>
+--- @param opt? { sort?: boolean, wrap_quote?: boolean } # default: true
+--- @return string
 local function dump_table(root, opt)
 	if (type(root) ~= "table") then return tostring(root); end;
-
-	local sort_keys = opt and opt.sort;
+	local sort_keys  = opt and opt.sort;
+	local wrap_quote = opt and opt.wrap_quote;
 
 	local out = { "{\n", };
 	local out_n = 1;
@@ -181,7 +185,10 @@ local function dump_table(root, opt)
 					elseif (k_type == "number") then
 						prefix = child_indent .. (INT_KEY_CACHE[next_k] or ("[" .. next_k .. "]")) .. " = ";
 					else
-						prefix = child_indent .. '["<' .. tostring(next_k) .. '>"] = ';
+						prefix =
+							wrap_quote
+							and child_indent .. '["<' .. tostring(next_k) .. '>"] = '
+							or child_indent .. '[<' .. tostring(next_k) .. '>] = ';
 					end;
 
 					local v_type = type(v);
@@ -194,7 +201,10 @@ local function dump_table(root, opt)
 						out[out_n] = prefix .. (v and "true,\n" or "false,\n");
 					elseif (v_type == "table") then
 						if (visited[v]) then
-							out[out_n] = prefix .. '"<cycle>",\n';
+							out[out_n] =
+								wrap_quote
+								and prefix .. '"<cycle>",\n'
+								or prefix .. "<cycle>,\n";
 						else
 							local next_depth = child_depth;
 							visited[v] = next_depth + 1;
@@ -211,7 +221,10 @@ local function dump_table(root, opt)
 							stack[next_offset + 7] = false;
 						end;
 					else
-						out[out_n] = prefix .. '"<' .. tostring(v) .. '>",\n';
+						out[out_n] =
+							wrap_quote
+							and prefix .. '"<' .. tostring(v) .. '>",\n'
+							or prefix .. "<" .. tostring(v) .. ">,\n";
 					end;
 				end;
 			else

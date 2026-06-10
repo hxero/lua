@@ -1,8 +1,8 @@
-local utils      = require("utils");
-local stack_dump = require("_dump");
+local dump  = require("utils.dump");
+local _dump = require("utils._dump");
 -- local inspect    = require("inspect");
 
-local timer = require("bench");
+local timer = require("utils.bench");
 
 -- local tbl = { [200] = { true, }, };
 -- for i = 1, 1e5, 1 do
@@ -65,7 +65,7 @@ local function table_merge(into, from)
 	return into;
 end;
 
-local deep_merge = utils.deep_merge;
+local deep_merge = require("utils.merge");
 
 local function build_t()
 	local a = { [200] = { true, }, };
@@ -105,6 +105,6 @@ end;
 timer.compares(timer.get_timers(), {
 	iterations = 5,
 	output = function(o)
-		return stack_dump.dump_table(o);
+		return dump(o);
 	end,
 });
