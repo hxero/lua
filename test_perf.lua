@@ -1,73 +1,110 @@
 local utils      = require("utils");
 local stack_dump = require("_dump");
-local inspect    = require("inspect");
+-- local inspect    = require("inspect");
 
-local timer = { {}, };
-timer.__index = timer;
+local timer = require("bench");
 
-function timer.new(name, fn)
-	local self = setmetatable({}, timer);
-	self.name  = name;
-	self.fn    = fn;
+-- local tbl = { [200] = { true, }, };
+-- for i = 1, 1e5, 1 do
+-- 	tbl["mycool" .. tostring(i)] = { tbl, [20] = i, { { { [2] = { { { { { { { { { { { {}, }, }, }, }, }, }, }, }, }, }, }, }, }, }, };
+-- end;
+--
+-- timer.new("iteration based", function()
+-- 	-- usually 1e5% slower than recursive
+-- 	-- no stackoverflow
+-- 	return utils.dump_table(tbl, { sort = true, });
+-- end);
+--
+-- timer.new("recursive based", function()
+-- 	-- usually the fastest
+-- 	-- but prone to stackoverflow on 1e5,000+ deep nested
+-- 	return stack_dump.dump_table(tbl, { sort = true, });
+-- end);
+--
+-- timer.new("inspect", function()
+-- 	-- most human readable?
+-- 	-- slower because so many checking
+-- 	return inspect(tbl);
+-- end);
+--
+-- timer.compares(timer.get_timers(), { iterations = 1e5, });
 
-	timer[1][#timer[1] + 1] = self;
-	return self;
-end;
-
-function timer.get_timers()
-	return timer[1];
-end;
-
-function timer:run(iterations)
-	iterations = iterations or 100;
-
-	collectgarbage("collect");
-
-	local clock = os.clock;
-	local start = clock();
-
-	for _ = 1, iterations do
-		self.output = self.fn();
+local function basic_merge(a, b)
+	for k, v in next, b do
+		local _av = a[k];
+		if (type(v) == "table" and type(_av) == "table") then
+			basic_merge(_av, v);
+		else
+			a[k] = v;
+		end;
 	end;
 
-	local total_time = clock() - start;
-
-	self.time = total_time / iterations;
-	return self.output;
+	return a;
 end;
 
-function timer:print()
-	print(self.name, "took", self.time);
+local function table_merge(into, from)
+	local stack = {};
+	local node1 = into;
+	local node2 = from;
+	while (true) do
+		for k, v in pairs(node2) do
+			if (type(v) == "table" and type(node1[k]) == "table") then
+				table.insert(stack, { node1[k], node2[k], });
+			else
+				node1[k] = v;
+			end;
+		end;
+		if (#stack > 0) then
+			local t = stack[#stack];
+			node1, node2 = t[1], t[2];
+			stack[#stack] = nil;
+		else
+			break;
+		end;
+	end;
+	return into;
 end;
 
-local tbl = { [200] = { true, }, };
-for i = 1, 1e4, 1 do
-	tbl["mycool" .. tostring(i)] = { tbl, [20] = i, { { { [2] = { { { { { { { { { { { {}, }, }, }, }, }, }, }, }, }, }, }, }, }, }, };
+local deep_merge = utils.deep_merge;
+
+local function build_t()
+	local a = { [200] = { true, }, };
+	for i = 1, 3e4, 1 do
+		a["mycool" .. tostring(i)] = { "2", [20] = i, { { { [2] = { { { { { { { { { { { {}, }, }, }, }, }, }, }, }, }, }, }, }, }, }, };
+	end;
+
+	local b = { [200] = { { { false, }, }, }, };
+	for i = 1, 3e4, 1 do
+		b["mycool" .. tostring(i)] = { 213901239, [20] = i - i, { { { [2] = {}, }, }, }, };
+	end;
+
+	return a, b;
 end;
 
-timer.new("iteration based", function()
-	-- usually 10% slower than recursive
-	-- no stackoverflow
-	return utils.dump_table(tbl, { sort = true, });
-end);
-
-timer.new("recursive based", function()
-	-- usually the fastest
-	-- but prone to stackoverflow on 10,000+ deep nested
-	return stack_dump.dump_table(tbl, { sort = true, });
-end);
-
-timer.new("inspect", function()
-	-- most human readable?
-	-- slower because so many checking
-	return inspect(tbl);
-end);
-
-local timers = timer.get_timers();
-for i = 1, #timers, 1 do
-	local output = timers[i]:run(10);
-	-- print(string.sub(output, 1, 1000) .. "\n...");
+do
+	local a, b = build_t();
+	timer.new("your basic merge", function()
+		return basic_merge(a, b);
+	end);
 end;
-for i = 1, #timers, 1 do
-	timers[i]:print();
+
+do
+	local a, b = build_t();
+	timer.new("revolucas", function()
+		return table_merge(a, b);
+	end);
 end;
+
+do
+	local a, b = build_t();
+	timer.new("mine", function()
+		return deep_merge(a, b);
+	end);
+end;
+
+timer.compares(timer.get_timers(), {
+	iterations = 5,
+	output = function(o)
+		return stack_dump.dump_table(o);
+	end,
+});
