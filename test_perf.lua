@@ -1,110 +1,88 @@
-local dump  = require("utils.dump");
-local _dump = require("utils._dump");
--- local inspect    = require("inspect");
+local bench = require("utils.bench");
 
-local timer = require("utils.bench");
+local dump    = require("utils.dump");
+local _dump   = require("utils._dump");
+local inspect = require("inspect");
 
--- local tbl = { [200] = { true, }, };
--- for i = 1, 1e5, 1 do
--- 	tbl["mycool" .. tostring(i)] = { tbl, [20] = i, { { { [2] = { { { { { { { { { { { {}, }, }, }, }, }, }, }, }, }, }, }, }, }, }, };
--- end;
---
--- timer.new("iteration based", function()
--- 	-- usually 1e5% slower than recursive
--- 	-- no stackoverflow
--- 	return utils.dump_table(tbl, { sort = true, });
--- end);
---
--- timer.new("recursive based", function()
--- 	-- usually the fastest
--- 	-- but prone to stackoverflow on 1e5,000+ deep nested
--- 	return stack_dump.dump_table(tbl, { sort = true, });
--- end);
---
--- timer.new("inspect", function()
--- 	-- most human readable?
--- 	-- slower because so many checking
--- 	return inspect(tbl);
--- end);
---
--- timer.compares(timer.get_timers(), { iterations = 1e5, });
+local function get_deepest(tbl)
+	local deepest   = tbl;
+	local max_depth = 0;
 
-local function basic_merge(a, b)
-	for k, v in next, b do
-		local _av = a[k];
-		if (type(v) == "table" and type(_av) == "table") then
-			basic_merge(_av, v);
-		else
-			a[k] = v;
-		end;
-	end;
+	local function recurse(node, depth)
+		local has_nested = false;
 
-	return a;
-end;
-
-local function table_merge(into, from)
-	local stack = {};
-	local node1 = into;
-	local node2 = from;
-	while (true) do
-		for k, v in pairs(node2) do
-			if (type(v) == "table" and type(node1[k]) == "table") then
-				table.insert(stack, { node1[k], node2[k], });
-			else
-				node1[k] = v;
+		for _, value in next, node do
+			if (type(value) == "table") then
+				has_nested = true;
+				recurse(value, depth + 1);
 			end;
 		end;
-		if (#stack > 0) then
-			local t = stack[#stack];
-			node1, node2 = t[1], t[2];
-			stack[#stack] = nil;
-		else
-			break;
+
+		if (not has_nested and depth > max_depth) then
+			max_depth = depth;
+			deepest   = node;
 		end;
 	end;
-	return into;
+
+	recurse(tbl, 1);
+	return deepest, max_depth;
 end;
 
-local deep_merge = require("utils.merge");
-
-local function build_t()
-	local a = { [200] = { true, }, };
-	for i = 1, 3e4, 1 do
-		a["mycool" .. tostring(i)] = { "2", [20] = i, { { { [2] = { { { { { { { { { { { {}, }, }, }, }, }, }, }, }, }, }, }, }, }, }, };
+local tbl = { {}, };
+local tbl2 = { {}, };
+local init = bench.new("initializing", function()
+	local deepest = get_deepest;
+	for i = 1, 1e6, 1 do
+		-- local ref = deepest(tbl);
+		tbl[i] = {
+			[1] = i,
+			[2] = true,
+			[{ c = "hello", }] = {
+				a = i + 10,
+				b = i ^ 2,
+			},
+			["ee"] = {},
+		};
+		tbl[i]["ee"]["socool" .. i] = {
+			[1] = true,
+			[true] = { false, },
+			a = "\n",
+		};
+		-- tbl[i] = { ref[2], };
 	end;
+	-- for i = 1, 1e4, 1 do
+	-- 	local ref = deepest(tbl2);
+	-- 	ref[1] = {
+	-- 		[2] = { true, },
+	-- 		[{ c = "hello", }] = {
+	-- 			a = i ^ 2,
+	-- 			b = i ^ 4,
+	-- 		},
+	-- 		["ee"] = { [400] = 100, },
+	-- 	};
+	-- 	ref[1]["ee"]["socool" .. i] = {
+	-- 		[1] = false,
+	-- 		[true] = { 1, },
+	-- 		a = "\n\n\n\n",
+	-- 	};
+	-- 	tbl2[i] = { ref[2], };
+	-- end;
+end);
 
-	local b = { [200] = { { { false, }, }, }, };
-	for i = 1, 3e4, 1 do
-		b["mycool" .. tostring(i)] = { 213901239, [20] = i - i, { { { [2] = {}, }, }, }, };
-	end;
+init:run();
+init:print();
+init:remove();
 
-	return a, b;
-end;
+io.write("\27[2K\r");
 
-do
-	local a, b = build_t();
-	timer.new("your basic merge", function()
-		return basic_merge(a, b);
-	end);
-end;
-
-do
-	local a, b = build_t();
-	timer.new("revolucas", function()
-		return table_merge(a, b);
-	end);
-end;
-
-do
-	local a, b = build_t();
-	timer.new("mine", function()
-		return deep_merge(a, b);
-	end);
-end;
-
-timer.compares(timer.get_timers(), {
-	iterations = 5,
-	output = function(o)
-		return dump(o);
-	end,
-});
+local filter = require("utils.filter");
+local subjects = {
+	bench.new("filter", function()
+		return filter(tbl, function(v)
+			return not not v;
+		end);
+	end),
+};
+bench.compares(subjects, { iterations = 2, });
+subjects = nil;
+collectgarbage("collect");

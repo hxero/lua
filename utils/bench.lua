@@ -30,6 +30,24 @@ function timer.new(name, fn)
 	return self;
 end;
 
+--- Removes the timer instance
+function timer:remove()
+	for i = #instances, 1, -1 do
+		if (instances[i] == self) then
+			table.remove(instances, i);
+			break;
+		end;
+	end;
+end;
+
+--- Removes all timers
+function timer.clear()
+	for i = 1, #instances, 1 do
+		instances[i] = nil;
+	end;
+	instances = {};
+end;
+
 --- Get a list of timers
 --- @return __HUTILS_BENCH[]
 function timer.get_timers()
@@ -37,23 +55,21 @@ function timer.get_timers()
 end;
 
 --- Run the timer
---- @param iterations integer # default: 100
+--- @param iterations? integer # default: 1
 --- @return unknown
 function timer:run(iterations)
 	assert(
 		type(iterations) == "nil" or type(iterations) == "number" or tonumber(iterations),
 		"`iterations` must be an integer");
 
-	iterations = math.floor(iterations) or 100;
+	iterations = math.floor(iterations or 1);
 
 	collectgarbage("collect");
 
 	local start = clock();
-
 	for _ = 1, iterations, 1 do
 		self.output = self.fn();
 	end;
-
 	local total_time = clock() - start;
 
 	self.time = total_time / iterations;
@@ -62,24 +78,24 @@ end;
 
 --- Prints the last benchmarked time
 function timer:print()
-	write(self.name, " took ", self.time);
+	write(self.name, " took ", self.time, "\n");
 end;
 
 --- Compares multiple timers instance
 --- @param timers __HUTILS_BENCH[]
---- @param opt?   { 
-	--- iterations?: integer,
-	--- output?: fun(unknown): string } # default: { iterations = 100, output = nil }
+--- @param opt?   {
+--- iterations?: integer,
+--- output?: fun(unknown): string } # default: { iterations = 10, output = nil }
 function timer.compares(timers, opt)
 	opt = opt or {};
 
 	local len = #timers;
 	for i = 1, len, 1 do
-		local output = tostring(timers[i]:run(opt.iterations or 100));
-		if (opt.output) then
-			write(sub(opt.output(output), 1, 100) .. "\n..");
+		local output = tostring(timers[i]:run(opt.iterations or 10));
+		if (opt.output and type(opt.output) == "function") then
+			write(sub(opt.output(output), 1, 100), "\n...\n");
 		else
-			write(sub(output, 1, 100) .. "\n...");
+			write(sub(output, 1, 100), "\n...\n");
 		end;
 	end;
 	for i = 1, len, 1 do

@@ -1,0 +1,14 @@
+{
+  "workspace": {
+    "library": [
+    ],
+    "ignoreDir": [
+      ".git"
+    ],
+    "maxPreload": 2000,
+    "preloadFileSize": 1000
+  },
+  "diagnostics": {
+    "workspaceDelay": 3000
+  }
+}
