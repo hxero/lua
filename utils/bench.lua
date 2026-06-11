@@ -67,7 +67,9 @@ end;
 
 --- Compares multiple timers instance
 --- @param timers __HUTILS_BENCH[]
---- @param opt?   { iterations?: integer, output?: fun(unknown): string  } # default: { iteration = 100, output = nil }
+--- @param opt?   { 
+	--- iterations?: integer,
+	--- output?: fun(unknown): string } # default: { iterations = 100, output = nil }
 function timer.compares(timers, opt)
 	opt = opt or {};
 

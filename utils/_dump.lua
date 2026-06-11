@@ -76,7 +76,7 @@ local function dump_table(root, opt)
 						out[out_n] = child_indent .. "},\n";
 					end;
 				else
-					out[out_n] = child_indent .. k_str .. ' = "<' .. tostring(v) .. '>",\n';
+					out[out_n] = child_indent .. k_str .. ' = <' .. tostring(v) .. '>,\n';
 				end;
 			end;
 		end;
@@ -133,7 +133,7 @@ local function dump_table(root, opt)
 				elseif (k_type == "number") then
 					prefix = child_indent .. (INT_KEY_CACHE[k] or ("[" .. k .. "]")) .. " = ";
 				else
-					prefix = child_indent .. '["<' .. tostring(k) .. '>"] = ';
+					prefix = child_indent .. '[<' .. tostring(k) .. '>] = ';
 				end;
 
 				local v_type = type(v);
@@ -155,7 +155,7 @@ local function dump_table(root, opt)
 						out[out_n] = child_indent .. "},\n";
 					end;
 				else
-					out[out_n] = prefix .. '"<' .. tostring(v) .. '>",\n';
+					out[out_n] = prefix .. '<' .. tostring(v) .. '>,\n';
 				end;
 			end;
 		else
@@ -173,7 +173,7 @@ local function dump_table(root, opt)
 					elseif (k_type == "number") then
 						prefix = child_indent .. (INT_KEY_CACHE[k] or ("[" .. k .. "]")) .. " = ";
 					else
-						prefix = child_indent .. '["<' .. tostring(k) .. '>"] = ';
+						prefix = child_indent .. '[<' .. tostring(k) .. '>] = ';
 					end;
 
 					local v_type = type(v);
@@ -195,7 +195,7 @@ local function dump_table(root, opt)
 							out[out_n] = child_indent .. "},\n";
 						end;
 					else
-						out[out_n] = prefix .. '"<' .. tostring(v) .. '>",\n';
+						out[out_n] = prefix .. '<' .. tostring(v) .. '>,\n';
 					end;
 				end;
 			end;
