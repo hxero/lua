@@ -91,11 +91,11 @@ function timer.compares(timers, opt)
 
 	local len = #timers;
 	for i = 1, len, 1 do
-		local output = tostring(timers[i]:run(opt.iterations or 10));
+		local output = timers[i]:run(opt.iterations or 10);
 		if (opt.output and type(opt.output) == "function") then
-			write(sub(opt.output(output), 1, 100), "\n...\n");
+			write(sub(tostring(opt.output(output)), 1, 100), "\n...\n");
 		else
-			write(sub(output, 1, 100), "\n...\n");
+			write(sub(tostring(output), 1, 100), "\n...\n");
 		end;
 	end;
 	for i = 1, len, 1 do

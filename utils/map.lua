@@ -16,7 +16,7 @@ local function map(tbl, fn, opt)
 	local result = override and tbl or {};
 	if (is_array) then
 		local len = #tbl;
-		for i = 1, len, 1 do
+		for i = 1, len do
 			result[i] = fn(tbl[i], i);
 		end;
 	else

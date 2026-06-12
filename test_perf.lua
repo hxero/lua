@@ -32,9 +32,9 @@ local tbl = { {}, };
 local tbl2 = { {}, };
 local init = bench.new("initializing", function()
 	local deepest = get_deepest;
-	for i = 1, 1e6, 1 do
-		-- local ref = deepest(tbl);
-		tbl[i] = {
+	for i = 1, 1e3, 1 do
+		local ref = deepest(tbl);
+		ref[1] = {
 			[1] = i,
 			[2] = true,
 			[{ c = "hello", }] = {
@@ -43,14 +43,14 @@ local init = bench.new("initializing", function()
 			},
 			["ee"] = {},
 		};
-		tbl[i]["ee"]["socool" .. i] = {
+		ref[1]["ee"]["socool" .. i] = {
 			[1] = true,
 			[true] = { false, },
 			a = "\n",
 		};
-		-- tbl[i] = { ref[2], };
+		tbl[i] = { ref[2], };
 	end;
-	-- for i = 1, 1e4, 1 do
+	-- for i = 1, 1e3, 1 do
 	-- 	local ref = deepest(tbl2);
 	-- 	ref[1] = {
 	-- 		[2] = { true, },
@@ -75,14 +75,15 @@ init:remove();
 
 io.write("\27[2K\r");
 
-local filter = require("utils.filter");
+local find = require("utils.find");
+
 local subjects = {
-	bench.new("filter", function()
-		return filter(tbl, function(v)
-			return not not v;
-		end);
+	bench.new("find", function()
+		return find(tbl, function(_, k)
+			return k == "socool231";
+		end, { is_array = false, deep = 1, });
 	end),
 };
-bench.compares(subjects, { iterations = 2, });
+bench.compares(subjects, { iterations = 10000, output = function(output) return _dump(output); end, });
 subjects = nil;
 collectgarbage("collect");
