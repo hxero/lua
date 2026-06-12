@@ -17,13 +17,8 @@ for i = 0, 64 do
 	INDENTS[i] = "\n" .. rep("  ", i);
 end;
 
-local out   = {};
-local out_n = 0;
-local seen  = {};
-
 local OPT_SORT       = false;
 local OPT_WRAP_QUOTE = false;
-local CYCLE_STR      = "<cycle>,";
 
 local function get_indent(depth)
 	local s = INDENTS[depth];
@@ -45,37 +40,34 @@ end;
 
 local format_node;
 
-local function write_value(v, v_type, depth)
+local function write_value(v, v_type, depth, out, n)
 	if (v_type == "string") then
-		out_n = out_n + 1;
-		out[out_n] = '"' .. escape_str(v) .. '",';
-	elseif (v_type == "number" or v_type == "boolean") then
-		out_n = out_n + 1;
-		out[out_n] = tostring(v) .. ",";
+		out[n + 1] = '"';
+		out[n + 2] = escape_str(v);
+		out[n + 3] = '",';
+		return n + 3;
+	elseif (v_type == "number") then
+		out[n + 1] = v;
+		out[n + 2] = ",";
+		return n + 2;
+	elseif (v_type == "boolean") then
+		out[n + 1] = v and "true," or "false,";
+		return n + 1;
 	elseif (v_type == "table") then
-		if (seen[v]) then
-			out_n = out_n + 1;
-			out[out_n] = CYCLE_STR;
-		else
-			format_node(v, depth);
-			out_n = out_n + 1;
-			out[out_n] = ",";
-		end;
+		n = format_node(v, depth, out, n);
+		out[n + 1] = ",";
+		return n + 1;
 	else
-		out_n = out_n + 1;
-		if (OPT_WRAP_QUOTE) then
-			out[out_n] = '"<' .. tostring(v) .. '>",';
-		else
-			out[out_n] = '<' .. tostring(v) .. '>,';
-		end;
+		out[n + 1] = OPT_WRAP_QUOTE
+			and ('"<' .. tostring(v) .. '>",')
+			or ('<' .. tostring(v) .. '>,');
+		return n + 1;
 	end;
 end;
 
-format_node = function(node, depth)
-	seen[node] = true;
-
-	out_n = out_n + 1;
-	out[out_n] = "{";
+format_node = function(node, depth, out, n)
+	n = n + 1;
+	out[n] = "{";
 
 	local child_indent = get_indent(depth + 1);
 	local self_indent  = get_indent(depth);
@@ -86,11 +78,13 @@ format_node = function(node, depth)
 			local v      = node[i];
 			local v_type = type(v);
 
-			out_n          = out_n + 2;
-			out[out_n - 1] = child_indent;
-			out[out_n]     = "[" .. i .. "] = ";
+			out[n + 1] = child_indent;
+			out[n + 2] = "[";
+			out[n + 3] = i;
+			out[n + 4] = "] = ";
+			n = n + 4;
 
-			write_value(v, v_type, depth + 1);
+			n = write_value(v, v_type, depth + 1, out, n);
 		end;
 	end;
 
@@ -112,31 +106,41 @@ format_node = function(node, depth)
 			local v      = node[k];
 			local v_type = type(v);
 
-			out_n = out_n + 1;
 			if (k_type == "string") then
 				if (match(k, "^[_%a][_%a%d]*$")) then
-					out[out_n] = child_indent .. k .. " = ";
+					out[n + 1] = child_indent;
+					out[n + 2] = k;
+					out[n + 3] = " = ";
+					n = n + 3;
 				else
-					out[out_n] = child_indent .. '["' .. escape_str(k) .. '"] = ';
+					out[n + 1] = child_indent;
+					out[n + 2] = '["';
+					out[n + 3] = escape_str(k);
+					out[n + 4] = '"] = ';
+					n = n + 4;
 				end;
 			elseif (k_type == "number") then
-				out[out_n] = child_indent .. "[" .. k .. "] = ";
+				out[n + 1] = child_indent;
+				out[n + 2] = "[";
+				out[n + 3] = k;
+				out[n + 4] = "] = ";
+				n = n + 4;
 			elseif (k_type == "table") then
-				if (seen[k]) then
-					out[out_n] = child_indent .. (OPT_WRAP_QUOTE and '["<cycle>"] = ' or '[<cycle>] = ');
-				else
-					out[out_n] = child_indent .. "[";
-					format_node(k, depth + 1);
-					out_n = out_n + 1;
-					out[out_n] = "] = ";
-				end;
+				out[n + 1] = child_indent;
+				out[n + 2] = "[";
+				n = n + 2;
+				n = format_node(k, depth + 1, out, n);
+				out[n + 1] = "] = ";
+				n = n + 1;
 			else
-				out[out_n] = child_indent .. (OPT_WRAP_QUOTE
-					and '["<' .. tostring(k) .. '>"] = '
-					or '[<' .. tostring(k) .. '>] = ');
+				out[n + 1] = child_indent;
+				out[n + 2] = OPT_WRAP_QUOTE
+					and ('["<' .. tostring(k) .. '>"] = ')
+					or ('[<' .. tostring(k) .. '>] = ');
+				n = n + 2;
 			end;
 
-			write_value(v, v_type, depth + 1);
+			n = write_value(v, v_type, depth + 1, out, n);
 		end;
 	else
 		local k, v = next(node, nil);
@@ -145,43 +149,52 @@ format_node = function(node, depth)
 			if (not (k_type == "number" and k >= 1 and k <= len and k % 1 == 0)) then
 				local v_type = type(v);
 
-				out_n = out_n + 1;
 				if (k_type == "string") then
 					if (match(k, "^[_%a][_%a%d]*$")) then
-						out[out_n] = child_indent .. k .. " = ";
+						out[n + 1] = child_indent;
+						out[n + 2] = k;
+						out[n + 3] = " = ";
+						n = n + 3;
 					else
-						out[out_n] = child_indent .. '["' .. escape_str(k) .. '"] = ';
+						out[n + 1] = child_indent;
+						out[n + 2] = '["';
+						out[n + 3] = escape_str(k);
+						out[n + 4] = '"] = ';
+						n = n + 4;
 					end;
 				elseif (k_type == "number") then
-					out[out_n] = child_indent .. "[" .. k .. "] = ";
+					out[n + 1] = child_indent;
+					out[n + 2] = "[";
+					out[n + 3] = k;
+					out[n + 4] = "] = ";
+					n = n + 4;
 				elseif (k_type == "table") then
-					if (seen[k]) then
-						out[out_n] = child_indent .. (OPT_WRAP_QUOTE and '["<cycle>"] = ' or '[<cycle>] = ');
-					else
-						out[out_n] = child_indent .. "[";
-						format_node(k, depth + 1);
-						out_n = out_n + 1;
-						out[out_n] = "] = ";
-					end;
+					out[n + 1] = child_indent;
+					out[n + 2] = "[";
+					n = n + 2;
+					n = format_node(k, depth + 1, out, n);
+					out[n + 1] = "] = ";
+					n = n + 1;
 				else
-					out[out_n] = child_indent .. (OPT_WRAP_QUOTE
-						and '["<' .. tostring(k) .. '>"] = '
-						or '[<' .. tostring(k) .. '>] = ');
+					out[n + 1] = child_indent;
+					out[n + 2] = OPT_WRAP_QUOTE
+						and ('["<' .. tostring(k) .. '>"] = ')
+						or ('[<' .. tostring(k) .. '>] = ');
+					n = n + 2;
 				end;
 
-				write_value(v, v_type, depth + 1);
+				n = write_value(v, v_type, depth + 1, out, n);
 			end;
 			k, v = next(node, k);
 		end;
 	end;
 
-	seen[node] = nil;
-
-	out_n = out_n + 1;
-	out[out_n] = self_indent .. "}";
+	out[n + 1] = self_indent;
+	out[n + 2] = "}";
+	return n + 2;
 end;
 
---- Dump table into readable string using recursive call
+--- Dump table into readable string using recursive call.
 --- @param root table<any, any>
 --- @param opt? { sort?: boolean, wrap_quote?: boolean }
 --- @return string
@@ -190,17 +203,11 @@ local function dump_table(root, opt)
 
 	OPT_SORT       = opt and opt.sort or false;
 	OPT_WRAP_QUOTE = opt and opt.wrap_quote or false;
-	CYCLE_STR      = OPT_WRAP_QUOTE and '"<cycle>",' or "<cycle>,";
 
-	out_n = 0;
+	local out = {};
+	local n = format_node(root, 0, out, 0);
 
-	format_node(root, 0);
-
-	local result = concat(out, "", 1, out_n);
-
-	for k in next, seen do seen[k] = nil; end;
-
-	return result;
+	return concat(out, "", 1, n);
 end;
 
 return dump_table;

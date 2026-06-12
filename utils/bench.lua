@@ -2,22 +2,12 @@ local type, tostring, sub = type, tostring, string.sub;
 local clock, write = os.clock, io.write;
 local setmetatable, collectgarbage = setmetatable, collectgarbage;
 
---- @class __HUTILS_BENCH
---- @field name   string
---- @field fn     function
---- @field output unknown | nil
---- @field time   number  | nil
 local timer = {};
 timer.__index = timer;
 
---- @type __HUTILS_BENCH[]
 local instances = {};
-setmetatable(instances, { __mode = "v", });
+setmetatable(instances, { __mode = "k", });
 
---- Create a new timer benchmark instance
---- @param name string
---- @param fn   function
---- @return __HUTILS_BENCH
 function timer.new(name, fn)
 	assert(name, "Missing required argument `name`");
 	assert(fn,   "Missing required argument `fn`");
@@ -26,40 +16,32 @@ function timer.new(name, fn)
 	self.name  = name;
 	self.fn    = fn;
 
-	instances[#instances + 1] = self;
+	instances[self] = true;
 	return self;
 end;
 
---- Removes the timer instance
 function timer:remove()
-	for i = #instances, 1, -1 do
-		if (instances[i] == self) then
-			table.remove(instances, i);
-			break;
-		end;
-	end;
+	instances[self] = nil;
 end;
 
---- Removes all timers
 function timer.clear()
-	for i = 1, #instances, 1 do
-		instances[i] = nil;
+	for inst in next, instances do
+		instances[inst] = nil;
 	end;
-	instances = {};
 end;
 
---- Get a list of timers
---- @return __HUTILS_BENCH[]
 function timer.get_timers()
-	return instances;
+	local list = {};
+	local n = 0;
+	for inst in next, instances do
+		n = n + 1;
+		list[n] = inst;
+	end;
+	return list;
 end;
 
---- Run the timer
---- @param iterations? integer # default: 1
---- @return unknown
 function timer:run(iterations)
-	assert(
-		type(iterations) == "nil" or type(iterations) == "number" or tonumber(iterations),
+	assert(type(iterations) == "nil" or type(iterations) == "number" or tonumber(iterations),
 		"`iterations` must be an integer");
 
 	iterations = math.floor(iterations or 1);
@@ -73,22 +55,18 @@ function timer:run(iterations)
 	local total_time = clock() - start;
 
 	self.time = total_time / iterations;
-	return self.output;
+
+	local out = self.output;
+
+	return out;
 end;
 
---- Prints the last benchmarked time
 function timer:print()
-	write(self.name, " took ", self.time, "\n");
+	write(self.name, " took ", self.time or 0, "\n");
 end;
 
---- Compares multiple timers instance
---- @param timers __HUTILS_BENCH[]
---- @param opt?   {
---- iterations?: integer,
---- output?: fun(unknown): string } # default: { iterations = 10, output = nil }
 function timer.compares(timers, opt)
 	opt = opt or {};
-
 	local len = #timers;
 	for i = 1, len, 1 do
 		local output = timers[i]:run(opt.iterations or 10);
