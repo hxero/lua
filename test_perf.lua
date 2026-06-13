@@ -1,33 +1,3 @@
-local bench = require("utils.bench");
-
-local dump    = require("utils.dump");
-local _dump   = require("utils._dump");
-local inspect = require("inspect");
-
-local function get_deepest(tbl)
-	local deepest   = tbl;
-	local max_depth = 0;
-
-	local function recurse(node, depth)
-		local has_nested = false;
-
-		for _, value in next, node do
-			if (type(value) == "table") then
-				has_nested = true;
-				recurse(value, depth + 1);
-			end;
-		end;
-
-		if (not has_nested and depth > max_depth) then
-			max_depth = depth;
-			deepest   = node;
-		end;
-	end;
-
-	recurse(tbl, 1);
-	return deepest, max_depth;
-end;
-
 -- local tbl = { {}, };
 -- local init = bench.new("initializing", function()
 -- 	for i = 1, 1e5 do
@@ -60,7 +30,19 @@ local table = setmetatable({}, {
 		if (table[v]) then
 			return table[v];
 		else
-			local ok, module = pcall(require, "utils." .. v);
+			local ok, module = pcall(require, "utils.table." .. v);
+			if (not ok) then return nil; end;
+			return module;
+		end;
+	end,
+});
+
+local string = setmetatable({}, {
+	__index = function(_, v)
+		if (string[v]) then
+			return string[v];
+		else
+			local ok, module = pcall(require, "utils.string." .. v);
 			if (not ok) then return nil; end;
 			return module;
 		end;
@@ -88,7 +70,7 @@ local ref = {
 		},
 	},
 };
-print("ORIGIN: ", ref);
+print("ORIGIN: ", ref, "\n");
 local cloned = table.clone(ref, { deep = true, iterative = false, });
 ref[1] = "abcdefgh";
 ref[2][1] = { 1000, };
@@ -97,10 +79,10 @@ ref[{ false, true, }] = "lol";
 print("MODIFIED ORIGIN: ", ref, "\n", "CLONED: Remain untouched\n", cloned);
 
 local merged = table.merge(ref, cloned);
-print("MERGED: ", merged);
+print("MERGED: ", merged, "\n");
 
 local _value, _key = table.find(merged, "lol", { is_array = false, deep = "recursive", });
-print("FIND: Found `", _value, "` with the key [", _key, "]");
+print("FIND: Found `", _value, "` with the key [", _key, "]\n");
 
 local flatten = table.flat(merged, { iterative = false, });
 print("FLAT:\n", flatten, "\n");
@@ -108,11 +90,3 @@ print("FLAT:\n", flatten, "\n");
 print("FILTER: Only `string` value\n", table.filter(flatten, function(v)
 	return type(v) == "string";
 end, { is_array = true, }));
-
--- local dumpy = require("utils._dump");
--- local _ = bench.new("dump", function()
--- 	return dumpy(tbl);
--- end);
--- print(_:run(10));
--- _:print();
--- _:remove();
