@@ -1,22 +1,20 @@
 --- Find a value in a table
---- @generic V, K
+--- @generic K, V
 --- @param tbl  table<K, V>
 --- @param val  V | fun(v: V, k?: K): unknown
---- @param opt? { is_array?: boolean, deep?: 1 | 2 }
+--- @param opt? { is_array?: boolean, deep?: "iterative" | "recursive" | nil }
+--- @return V, K | nil
 local function find(tbl, val, opt)
+	local type, next = type, next;
 	if (not tbl or not next(tbl)) then return nil; end;
 
-	local is_array = true;
-	local deep     = nil;
-	if (opt) then
-		if (opt.is_array ~= nil) then is_array = opt.is_array; end;
-		if (opt.deep ~= nil) then deep = opt.deep; end;
-	end;
+	local is_array = opt == nil or opt.is_array == nil or opt.is_array ~= false;
+	local deep     = opt and opt.deep or 1;
 
 	local is_fn = type(val) == "function";
 
 	-- stack based iteration
-	if (deep == 1) then
+	if (deep == "iterative") then
 		local stack     = { tbl, };
 		local stack_top = 1;
 		if (is_fn) then
@@ -90,7 +88,7 @@ local function find(tbl, val, opt)
 	end;
 
 	-- recursive call stacks
-	if (deep == 2) then
+	if (deep == "recursive") then
 		local function recurse(node)
 			if (is_fn) then
 				if (is_array) then

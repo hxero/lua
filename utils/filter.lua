@@ -1,4 +1,3 @@
-
 --- Filters table values
 --- @generic V, K
 --- @param tbl  table<K, V>
@@ -7,12 +6,8 @@
 local function filter(tbl, fn, opt)
 	if (not tbl or not next(tbl)) then return tbl; end;
 
-	local override = false;
-	local is_array = true;
-	if (opt) then
-		if (opt.override ~= nil) then override = opt.override; end;
-		if (opt.is_array ~= nil) then is_array = opt.is_array; end;
-	end;
+	local is_array = opt and opt.is_array or false;
+	local override = opt and opt.override or false;
 
 	if (is_array) then
 		if (override) then

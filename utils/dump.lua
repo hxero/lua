@@ -32,7 +32,57 @@ local function sort_handler(a, b)
 	return tostring(a) < tostring(b);
 end;
 
---- Dump table into readable string using stack based iteration
+local function encode_scalar(output, output_n, v, vt, wrap_quote)
+	if (vt == "string") then
+		output_n         = output_n + 1;
+		output[output_n] = find(v, escape_match)
+			and '"' .. gsub(v, escape_match, escape_map) .. '"'
+			or '"' .. v .. '"';
+	elseif (vt == "number" or vt == "boolean") then
+		output_n         = output_n + 1;
+		output[output_n] = tostring(v);
+	else
+		output_n         = output_n + 1;
+		output[output_n] = wrap_quote
+			and '"<' .. tostring(v) .. '>"'
+			or '<' .. tostring(v) .. '>';
+	end;
+	return output_n;
+end;
+
+local function plain_seq_len(t)
+	local n = #t;
+	if (n == 0) then return false; end;
+	for k in next, t do
+		local kt = math_type(k);
+		if (not (kt == "integer" and k >= 1 and k <= n)) then
+			return false;
+		end;
+		if (type(t[k]) == "table") then
+			return false;
+		end;
+	end;
+	return n;
+end;
+
+local function render_inline(output, output_n, node, n, wrap_quote)
+	output_n         = output_n + 1;
+	output[output_n] = "{ ";
+	for i = 1, n do
+		local v  = node[i];
+		local vt = type(v);
+		output_n = encode_scalar(output, output_n, v, vt, wrap_quote);
+		if (i < n) then
+			output_n         = output_n + 1;
+			output[output_n] = ", ";
+		end;
+	end;
+	output_n         = output_n + 1;
+	output[output_n] = " }";
+	return output_n;
+end;
+
+--- Dump table into readable string using stack-based iteration
 --- @param root table<any, any>
 --- @param opt? { sort?: boolean, wrap_quote?: boolean }
 --- @return string
@@ -42,6 +92,11 @@ local function dump_table(root, opt)
 	local sort_keys  = opt and opt.sort;
 	local wrap_quote = opt and opt.wrap_quote;
 	local cycle_str  = wrap_quote and '"<cycle>"' or "<cycle>";
+
+	do
+		local n = plain_seq_len(root);
+		if (n) then return render_inline({}, 0, root, n, wrap_quote); end;
+	end;
 
 	local output   = {};
 	local output_n = 1;
@@ -62,22 +117,20 @@ local function dump_table(root, opt)
 
 		local seq_i = frame[3];
 		if (seq_i <= seq_len) then
-			frame[3]         = seq_i + 1;
-			output_n         = output_n + 1;
-			output[output_n] = indent .. "[" .. seq_i .. "] = ";
+			frame[3] = seq_i + 1;
 
-			local v = node[seq_i];
+			output_n         = output_n + 1;
+			output[output_n] = indent;
+
+			local v  = node[seq_i];
 			local vt = type(v);
-			if (vt == "string") then
-				output_n         = output_n + 1;
-				output[output_n] = find(v, escape_match)
-					and '"' .. gsub(v, escape_match, escape_map) .. '",'
-					or '"' .. v .. '",';
-			elseif (vt == "number" or vt == "boolean") then
-				output_n         = output_n + 1;
-				output[output_n] = tostring(v) .. ",";
-			elseif (vt == "table") then
-				if (seen[v]) then
+			if (vt == "table") then
+				local pn = plain_seq_len(v);
+				if (pn) then
+					output_n         = render_inline(output, output_n, v, pn, wrap_quote);
+					output_n         = output_n + 1;
+					output[output_n] = ",";
+				elseif (seen[v]) then
 					output_n         = output_n + 1;
 					output[output_n] = cycle_str .. ",";
 				else
@@ -88,10 +141,9 @@ local function dump_table(root, opt)
 					stack[stack_n]   = { v, depth + 1, 1, nil, nil, 1, false, nil, };
 				end;
 			else
+				output_n         = encode_scalar(output, output_n, v, vt, wrap_quote);
 				output_n         = output_n + 1;
-				output[output_n] = wrap_quote
-					and '"<' .. tostring(v) .. '>",'
-					or '<' .. tostring(v) .. '>,';
+				output[output_n] = ",";
 			end;
 		elseif (frame[7]) then
 			seen[node]       = nil;
@@ -101,16 +153,13 @@ local function dump_table(root, opt)
 
 			local v  = frame[8];
 			local vt = type(v);
-			if (vt == "string") then
-				output_n         = output_n + 1;
-				output[output_n] = find(v, escape_match)
-					and '"' .. gsub(v, escape_match, escape_map) .. '",'
-					or '"' .. v .. '",';
-			elseif (vt == "number" or vt == "boolean") then
-				output_n         = output_n + 1;
-				output[output_n] = tostring(v) .. ",";
-			elseif (vt == "table") then
-				if (seen[v]) then
+			if (vt == "table") then
+				local pn = plain_seq_len(v);
+				if (pn) then
+					output_n         = render_inline(output, output_n, v, pn, wrap_quote);
+					output_n         = output_n + 1;
+					output[output_n] = ",";
+				elseif (seen[v]) then
 					output_n         = output_n + 1;
 					output[output_n] = cycle_str .. ",";
 				else
@@ -121,10 +170,9 @@ local function dump_table(root, opt)
 					stack[stack_n]   = { v, depth, 1, nil, nil, 1, false, nil, };
 				end;
 			else
+				output_n         = encode_scalar(output, output_n, v, vt, wrap_quote);
 				output_n         = output_n + 1;
-				output[output_n] = wrap_quote
-					and '"<' .. tostring(v) .. '>",'
-					or '<' .. tostring(v) .. '>,';
+				output[output_n] = ",";
 			end;
 		else
 			local k, v;
@@ -191,16 +239,13 @@ local function dump_table(root, opt)
 				end;
 
 				local vt = type(v);
-				if (vt == "string") then
-					output_n         = output_n + 1;
-					output[output_n] = find(v, escape_match)
-						and '"' .. gsub(v, escape_match, escape_map) .. '",'
-						or '"' .. v .. '",';
-				elseif (vt == "number" or vt == "boolean") then
-					output_n         = output_n + 1;
-					output[output_n] = tostring(v) .. ",";
-				elseif (vt == "table") then
-					if (seen[v]) then
+				if (vt == "table") then
+					local pn = plain_seq_len(v);
+					if (pn) then
+						output_n         = render_inline(output, output_n, v, pn, wrap_quote);
+						output_n         = output_n + 1;
+						output[output_n] = ",";
+					elseif (seen[v]) then
 						output_n         = output_n + 1;
 						output[output_n] = cycle_str .. ",";
 					else
@@ -211,10 +256,9 @@ local function dump_table(root, opt)
 						stack[stack_n]   = { v, depth + 1, 1, nil, nil, 1, false, nil, };
 					end;
 				else
+					output_n         = encode_scalar(output, output_n, v, vt, wrap_quote);
 					output_n         = output_n + 1;
-					output[output_n] = wrap_quote
-						and '"<' .. tostring(v) .. '>",'
-						or '<' .. tostring(v) .. '>,';
+					output[output_n] = ",";
 				end;
 			end;
 		end;
