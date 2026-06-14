@@ -52,7 +52,7 @@ end;
 
 local function plain_seq_len(t)
 	local n = #t;
-	if (n == 0) then return false; end;
+	if (n == 0) then return 0; end;
 	for k in next, t do
 		local kt = math_type(k);
 		if (not (kt == "integer" and k >= 1 and k <= n)) then
@@ -66,6 +66,12 @@ local function plain_seq_len(t)
 end;
 
 local function render_inline(output, output_n, node, n, wrap_quote)
+	if (n == 0) then
+		output_n         = output_n + 1;
+		output[output_n] = "{}";
+		return output_n;
+	end;
+
 	output_n         = output_n + 1;
 	output[output_n] = "{ ";
 	for i = 1, n do
@@ -95,7 +101,11 @@ local function dump_table(root, opt)
 
 	do
 		local n = plain_seq_len(root);
-		if (n) then return render_inline({}, 0, root, n, wrap_quote); end;
+		if (n) then
+			local buf = {};
+			render_inline(buf, 0, root, n, wrap_quote);
+			return concat(buf);
+		end;
 	end;
 
 	local output   = {};

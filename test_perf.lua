@@ -1,53 +1,35 @@
--- local tbl = { {}, };
--- local init = bench.new("initializing", function()
--- 	for i = 1, 1e5 do
--- 		tbl[1] = {
--- 			[i] = i,
--- 			[2] = true,
--- 			[{ c = "hello", }] = {
--- 				a = i + 10,
--- 				b = i ^ 2,
--- 			},
--- 			["ee"] = {},
--- 		};
--- 		tbl[i] = { ee = {}, };
--- 		tbl[i]["ee"]["socool" .. i] = {
--- 			[1] = true,
--- 			[true] = { false, },
--- 			a = "\n",
--- 		};
--- 	end;
--- end);
---
--- init:run();
--- init:print();
--- init:remove();
---
--- io.write("\27[2K\r");
+--[[
+local bench = require("utils.misc.bench");
 
-local table = setmetatable({}, {
-	__index = function(_, v)
-		if (table[v]) then
-			return table[v];
-		else
-			local ok, module = pcall(require, "utils.table." .. v);
-			if (not ok) then return nil; end;
-			return module;
-		end;
-	end,
-});
+local tbl = { {}, };
+local init = bench.new("initializing", function()
+	for i = 1, 1e5 do
+		tbl[1] = {
+			[i] = i,
+			[2] = true,
+			[{ c = "hello", }] = {
+				a = i + 10,
+				b = i ^ 2,
+			},
+			["ee"] = {},
+		};
+		tbl[i] = { ee = {}, };
+		tbl[i]["ee"]["socool" .. i] = {
+			[1] = true,
+			[true] = { false, },
+			a = "\n",
+		};
+	end;
+end);
 
-local string = setmetatable({}, {
-	__index = function(_, v)
-		if (string[v]) then
-			return string[v];
-		else
-			local ok, module = pcall(require, "utils.string." .. v);
-			if (not ok) then return nil; end;
-			return module;
-		end;
-	end,
-});
+init:run();
+init:print();
+init:remove();
+
+io.write("\27[2K\r");
+--]]
+
+local table = require("utils.table");
 
 local print = function(...)
 	io.write(table.concat(table.map({ ..., }, function(v)
@@ -58,6 +40,7 @@ end;
 local ref = {
 	"abc",
 	{
+		[{}] = true,
 		["def"] = 5,
 		{
 			[{

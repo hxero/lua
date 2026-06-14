@@ -38,7 +38,7 @@ end;
 
 local function plain_seq_len(t)
 	local n = #t;
-	if (n == 0) then return false; end;
+	if (n == 0) then return 0; end;
 	for k in next, t do
 		if (not (math_type(k) == "integer" and k >= 1 and k <= n)) then
 			return false;
@@ -78,8 +78,13 @@ local function write_value(v, v_type, depth, out, n, wrap_quote, sort_keys, seen
 end;
 
 local function write_inline(node, pn, out, n, wrap_quote)
-	out[n + 1] = "{ ";
+	if (pn == 0) then
+		n = n + 1;
+		out[n] = "{}";
+		return n;
+	end;
 	n = n + 1;
+	out[n] = "{ ";
 	for i = 1, pn do
 		local v  = node[i];
 		local vt = type(v);
@@ -132,9 +137,9 @@ format_node = function(node, depth, out, n, wrap_quote, sort_keys, seen)
 	for i = 1, len do
 		local v      = node[i];
 		local v_type = type(v);
-		out[n + 1] = child_indent;
-		n = n + 1;
-		n = write_value(v, v_type, depth + 1, out, n, wrap_quote, sort_keys, seen);
+		out[n + 1]   = child_indent;
+		n            = n + 1;
+		n            = write_value(v, v_type, depth + 1, out, n, wrap_quote, sort_keys, seen);
 	end;
 
 	if (sort_keys) then
@@ -251,7 +256,7 @@ end;
 local function dump_table(root, opt)
 	if (type(root) ~= "table") then return tostring(root); end;
 
-	local sort_keys  = opt and opt.sort  or false;
+	local sort_keys  = opt and opt.sort or false;
 	local wrap_quote = opt and opt.wrap_quote or false;
 	local seen       = {};
 	local out        = {};
