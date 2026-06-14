@@ -6,6 +6,4 @@ local function clear(tbl)
 	return tbl;
 end;
 
-print(require "_dump" (clear({ 1, 2, 3, key = "value", })));
-
 return clear;
