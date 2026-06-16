@@ -73,3 +73,5 @@ print("FLAT:\n", flatten, "\n");
 print("FILTER: Only `string` value\n", table.filter(flatten, function(v)
 	return type(v) == "string";
 end, { is_array = true, }));
+
+print("\n", "CLEARED: ", table.clear(merged));

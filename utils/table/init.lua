@@ -1,10 +1,12 @@
+local PREFIX = (...);
+
 --- @class UtilsTable: table
 local M = setmetatable({}, {
 	__index = function(t, v)
 		if (table[v]) then return table[v]; end;
 		if (rawget(t, v)) then return rawget(t, v); end;
 
-		local ok, mod = pcall(require, "utils.table." .. v);
+		local ok, mod = pcall(require, PREFIX .. "." .. v);
 		if (not ok) then return nil; end;
 
 		t[v] = mod;
@@ -24,6 +26,7 @@ if (false) then --- @diagnostic disable
 
 	-- spoof type annotation without loading
 	M._dump  = require("utils.table._dump");
+	M.clear  = require("utils.table.clear");
 	M.clone  = require("utils.table.clone");
 	M.dump   = require("utils.table.dump");
 	M.filter = require("utils.table.filter");
